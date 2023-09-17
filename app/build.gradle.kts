@@ -71,9 +71,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.2.3"))
     implementation("com.google.firebase:firebase-config-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
-
     implementation("com.google.gms:google-services:4.3.15")
-
 
     //Retrofit and other
     implementation("io.coil-kt:coil-compose:2.0.0")
@@ -81,5 +79,4 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }
 
-apply(plugin = "com.google.gms.google-services")
 

@@ -52,12 +52,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.autoSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -68,10 +70,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue.Companion.Saver
@@ -306,6 +311,7 @@ fun WebView(url : String){
     var searchText by rememberSaveable { mutableStateOf("") }
     var searchResult by rememberSaveable { mutableStateOf(0) }
     var targetMatches by rememberSaveable { mutableStateOf(0) }
+    var isLoading by rememberSaveable { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     var webView by remember{
@@ -328,17 +334,18 @@ fun WebView(url : String){
             webView.findAllAsync(searchText)
 
             webView.setFindListener { activeMatchOrdinal, numberOfMatches, isDoneCounting ->
-                targetMatches = activeMatchOrdinal
+                targetMatches = activeMatchOrdinal + 1
 
                 if (isDoneCounting) {
                     searchIsComplete = true
                     searchResult = if (numberOfMatches > 0) {
                         numberOfMatches
-                    }else{
+                    } else {
                         0
                     }
                 }
             }
+
             stateSearchAnimation = false
         }
     }
@@ -351,6 +358,15 @@ fun WebView(url : String){
         webView.clearMatches()
     }
 
+    if(isLoading){
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ){
+            CircularProgressIndicator()
+        }
+    }
+
     AndroidView(
         modifier = Modifier.fillMaxSize(),
         factory = { context ->
@@ -360,10 +376,16 @@ fun WebView(url : String){
                         view: WebView?,
                         request: WebResourceRequest?
                     ): Boolean {
+                        isLoading = true
                         if(searchText.isNotEmpty())
                             onDismiss()
                         return super.shouldOverrideUrlLoading(view, request)
                     }
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        super.onPageFinished(view, url)
+                        isLoading = false
+                    }
+
                 }
                 val cookieManager: CookieManager = CookieManager.getInstance()
                 val webSettings = this.settings
@@ -386,13 +408,19 @@ fun WebView(url : String){
                     webView = this
                     loadUrl(url)
                 }
-
             }
         },
         update = {
             webView.restoreState(webViewState)
         }
     )
+
+    LaunchedEffect(Unit){
+        if (searchText.isNotEmpty()) {
+            delay(2000L)
+            onSearch()
+        }
+    }
 
     AnimatedVisibility(
         visible = stateSearchAnimation,
