@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "735749339520",
+    "project_id": "vdjvif87",
+    "storage_bucket": "vdjvif87.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:735749339520:android:e828572bced38097812965",
+        "android_client_info": {
+          "package_name": "trustyapp.gameskud"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_dEfWjH9Bl9Kqg47cW5C-N3Qv6kQ7-zA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
