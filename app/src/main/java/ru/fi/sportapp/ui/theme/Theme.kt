@@ -1,4 +1,4 @@
-package ru.fi.sportapp.ui.theme
+package ru.fi.colorGame.ui.theme
 
 import android.app.Activity
 import android.os.Build

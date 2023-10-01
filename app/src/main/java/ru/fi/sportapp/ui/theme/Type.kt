@@ -1,4 +1,4 @@
-package ru.fi.sportapp.ui.theme
+package ru.fi.colorGame.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

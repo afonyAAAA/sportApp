@@ -1,4 +1,4 @@
-package ru.fi.sportapp.viewModels
+package ru.fi.colorGame.viewModels
 
 import android.content.Context
 import android.net.ConnectivityManager

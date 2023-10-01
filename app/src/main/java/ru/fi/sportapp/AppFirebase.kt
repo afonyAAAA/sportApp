@@ -1,4 +1,4 @@
-package ru.fi.sportapp
+package ru.fi.colorGame
 
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
