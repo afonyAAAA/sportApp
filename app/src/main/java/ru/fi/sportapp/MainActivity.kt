@@ -1,4 +1,4 @@
-package ru.fi.colorGame
+package ru.fi.sportapp
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
@@ -48,6 +49,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -73,6 +75,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.text.withStyle
@@ -81,10 +84,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.delay
-import ru.fi.colorGame.ui.theme.SportAppTheme
-import ru.fi.colorGame.viewModels.GameViewModel
-import ru.fi.colorGame.viewModels.MainViewModel
-import ru.fi.sportapp.R
+import ru.fi.sportapp.models.GameStatus
+import ru.fi.sportapp.ui.theme.SportAppTheme
+import ru.fi.sportapp.viewModels.GameViewModel
+import ru.fi.sportapp.viewModels.MainViewModel
+import java.text.NumberFormat
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     private fun restartApp(context: Context){
@@ -172,11 +177,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-enum class GameStatus {
-    PLAYING,
-    WIN,
-    LOSE
-}
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class, ExperimentalTextApi::class)
 @Composable
@@ -184,7 +184,9 @@ fun ReallyApp(viewModel: GameViewModel){
 
 
     val context = LocalContext.current
+    val clipBox = RoundedCornerShape(15.dp)
     val aniSpecFloat = tween<Float>(durationMillis = 500, delayMillis = 300)
+    val numberFormat = NumberFormat.getNumberInstance(Locale.US)
 
     if(!viewModel.isStartGame){
         WelcomeFragment(text = "Color Game"){
@@ -209,9 +211,12 @@ fun ReallyApp(viewModel: GameViewModel){
                         Icon(
                             imageVector = Icons.Outlined.Info,
                             contentDescription = "",
-                            modifier = Modifier.size(30.dp).padding(end = 5.dp).clickable {
-                                viewModel.showDialogAboutGame = true
-                            }
+                            modifier = Modifier
+                                .size(30.dp)
+                                .padding(end = 5.dp)
+                                .clickable {
+                                    viewModel.showDialogAboutGame = true
+                                }
                         )
                     }
                 )
@@ -223,66 +228,83 @@ fun ReallyApp(viewModel: GameViewModel){
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
             ) {
-                if (viewModel.gameStatus == GameStatus.PLAYING || viewModel.gameStatus == GameStatus.WIN) {
-
-                    val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
-                    val scale by infiniteTransition.animateFloat(
-                        initialValue = 2f,
-                        targetValue = 1f,
-                        animationSpec = infiniteRepeatable(tween(1000), RepeatMode.Reverse),
-                        label = "scale"
-                    )
-
-                    if(viewModel.gameStatus == GameStatus.WIN){
-                        Text(
-                            text = "You win!",
-                            modifier = Modifier.graphicsLayer {
-                                scaleX = scale
-                                scaleY = scale
-                                transformOrigin = TransformOrigin.Center
-                            },
-                            style = LocalTextStyle.current.copy(textMotion = TextMotion.Animated)
-                        )
+                if (viewModel.gameStatus == GameStatus.PLAYING) {
+                    AnimatedContent(targetState = viewModel.xScope, label = "") {x ->
+                        Text(text = x.toString() + "X", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold)
                     }
 
                     AnimatedContent(targetState = viewModel.score, label = "") { score ->
                         Text(
-                            text = "Score: $score",
+                            text = "Score: ${numberFormat.format(score)}",
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
-
                     Box(
                         modifier = Modifier
                             .size(150.dp)
+                            .clip(clipBox)
                             .background(
-                                viewModel.changeColor?.color ?: viewModel.targetColor?.color
-                                ?: Color.Gray
+                                viewModel.changeColor?.color ?: Color.Gray
                             )
                     ) {}
 
                     AnimatedVisibility(visible = viewModel.changeColor != null) {
-                        Button(onClick = {
-                            if (viewModel.changeColor == null) {
-                                Toast
-                                    .makeText(
-                                        context,
-                                        "Please, select color",
-                                        Toast.LENGTH_SHORT
-                                    )
-                                    .show()
-                            } else {
-                                viewModel.roll()
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Button(onClick = {
+                                if (viewModel.changeColor == null) {
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "Please, select color",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                }else if (viewModel.numberStringBet.filter { it.isDigit() }.toLong() > viewModel.score) {
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "Not enough points to bet",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                }else
+                                    viewModel.roll()
+                                },
+                                enabled = viewModel.numberStringBet.isNotEmpty()
+                            ) {
+                                Text(
+                                    text = "Roll Dice",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.White
+                                )
                             }
-                        }) {
-                            Text(
-                                text = "Roll Dice",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            OutlinedTextField(
+                                value = viewModel.numberStringBet,
+                                onValueChange = { value ->
+                                    if(value.length < 15){
+                                        val digitsOnly = value.filter { it.isDigit() }
+
+                                        val number = digitsOnly.toLongOrNull()
+
+                                        if (number != null) {
+                                            viewModel.numberStringBet = NumberFormat.getNumberInstance().format(number)
+                                        } else {
+                                            viewModel.numberStringBet = ""
+                                        }
+                                    }
+                                },
+                                label = {
+                                    Text(text = "Your bet")
+                                },
+                                placeholder = {
+                                    Text(text = "Enter bet")
+                                },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                             )
                         }
                     }
-
 
                     Spacer(modifier = Modifier.height(25.dp))
 
@@ -300,24 +322,88 @@ fun ReallyApp(viewModel: GameViewModel){
                         }
                     }
 
-                }else {
+                }else if(viewModel.gameStatus == GameStatus.WIN){
+
+                    val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
+                    val scale by infiniteTransition.animateFloat(
+                        initialValue = 2f,
+                        targetValue = 1f,
+                        animationSpec = infiniteRepeatable(tween(1000), RepeatMode.Reverse),
+                        label = "scale"
+                    )
+
                     Text(
-                        text = when (viewModel.gameStatus) {
-                            GameStatus.WIN -> "You Win!"
-                            GameStatus.LOSE -> "You Lose!"
-                            else -> ""
+                        text = "You win!",
+                        modifier = Modifier.graphicsLayer {
+                            scaleX = scale
+                            scaleY = scale
+                            transformOrigin = TransformOrigin.Center
                         },
+                        style = LocalTextStyle.current.copy(textMotion = TextMotion.Animated)
+                    )
+
+                    Text(text = "Dropped colors : ${viewModel.targetColors.joinToString(transform = {it!!.name})}")
+
+                    DroppedColors(viewModel = viewModel)
+
+                    AnimatedContent(targetState = viewModel.xScope, label = "") {x ->
+                        Text(text = x.toString() + "X", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold)
+                    }
+
+                    AnimatedContent(targetState = viewModel.score, label = "") { score ->
+                        Text(
+                            text = "Score: ${numberFormat.format(score)}",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+
+                    Button(onClick = { viewModel.gameStatus = GameStatus.PLAYING }) {
+                        Text(text = "ОК")
+                    }
+
+                }else if (viewModel.gameStatus == GameStatus.LOSE && viewModel.score == 0.0){
+                    Text(
+                        text =  "You Lose!",
                         style = MaterialTheme.typography.headlineLarge,
                         color = Color.Black,
                         textAlign = TextAlign.Center
                     )
 
-                    Text(text = "Final score: ${viewModel.score}")
+                    Text(text = "Dropped colors : ${viewModel.targetColors.joinToString(transform = {it!!.name})}")
+
+                    DroppedColors(viewModel = viewModel)
+
+                    Text(text = "Max score: ${numberFormat.format(viewModel.maxScore)}")
 
                     Button(onClick = { viewModel.resume() }) {
                         Text(text = "Play again")
                     }
+                }else{
+                    Text(
+                        text = "You lose!",
+                        style = LocalTextStyle.current.copy(textMotion = TextMotion.Animated)
+                    )
+
+                    Text(text = "Dropped colors : ${viewModel.targetColors.joinToString(transform = {it!!.name})}")
+
+                    DroppedColors(viewModel = viewModel)
+
+                    AnimatedContent(targetState = viewModel.xScope, label = "") {x ->
+                        Text(text = x.toString() + "X", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold)
+                    }
+
+                    AnimatedContent(targetState = viewModel.score, label = "") { score ->
+                        Text(
+                            text = "Score: $score",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+
+                    Button(onClick = { viewModel.gameStatus = GameStatus.PLAYING }) {
+                        Text(text = "ОК")
+                    }
                 }
+
 
                 if(viewModel.showDialogAboutGame){
                     AboutGame{
@@ -325,6 +411,24 @@ fun ReallyApp(viewModel: GameViewModel){
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun DroppedColors(
+    viewModel : GameViewModel
+){
+    LazyRow{
+        items(viewModel.targetColors){color ->
+            Box(
+                modifier = Modifier
+                    .size(150.dp)
+                    .padding(15.dp)
+                    .background(
+                        color?.color ?: Color.Gray, RoundedCornerShape(15.dp)
+                    )
+            ) {}
         }
     }
 }
@@ -435,7 +539,7 @@ fun AboutGame(onDismiss: () -> Unit){
 
                 Text(
                     text = "1. Select a color from the list\n" +
-                            "2. Click on the \"Roll dice\" button\n" +
+                            "2. Click on the \"Roll Dice\" button\n" +
                             "3. Expect to win!"
                 )
 

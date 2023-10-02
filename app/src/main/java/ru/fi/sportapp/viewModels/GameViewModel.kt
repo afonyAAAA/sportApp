@@ -1,16 +1,15 @@
-package ru.fi.colorGame.viewModels
+package ru.fi.sportapp.viewModels
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
-import ru.fi.colorGame.GameStatus
-import ru.fi.colorGame.models.MyColor
+import ru.fi.sportapp.models.GameStatus
+import ru.fi.sportapp.models.MyColor
 
 class GameViewModel : ViewModel() {
 
-    var isStartGame by mutableStateOf(false)
     val colors = listOf(
         MyColor(Color.Magenta, "Magenta"),
         MyColor(Color.Red, "Red"),
@@ -19,33 +18,47 @@ class GameViewModel : ViewModel() {
         MyColor(Color.Cyan, "Cyan"),
         MyColor(Color.Yellow, "Yellow")
     )
-    private var xScope by mutableStateOf(1)
+    var maxScore = 0.0
+    var xScope by mutableStateOf(1)
     var gameStatus by mutableStateOf(GameStatus.PLAYING)
-    var targetColor by mutableStateOf<MyColor?>(null)
+    var targetColors by mutableStateOf(mutableListOf<MyColor?>())
     var changeColor by mutableStateOf<MyColor?>(null)
-    var score by mutableStateOf(0)
+    var score by mutableStateOf(100.0)
+    var numberStringBet by mutableStateOf("")
     var showDialogAboutGame by mutableStateOf(false)
+    var isStartGame by mutableStateOf(false)
 
     private fun generateRandomColor() {
-        targetColor = colors.random()
+
+        if(targetColors.isNotEmpty()) targetColors.clear()
+
+        repeat(3){
+            targetColors.add(colors.random())
+        }
+
     }
     private fun checkColor() {
-        if(changeColor!!.color == targetColor!!.color){
-            if(score != 0) xScope++
+        val numberBetToLong = numberStringBet.filter { it.isDigit() }.toLong()
+
+        if(targetColors!!.contains(changeColor)){
+            xScope++
             gameStatus = GameStatus.WIN
-            score += (score + 1) * xScope
-            changeColor = null
+            score += (score + numberBetToLong) * xScope
+            if(maxScore < score) maxScore = score
         }else{
+            xScope = 1
+            score -= numberBetToLong
             gameStatus = GameStatus.LOSE
         }
+        changeColor = null
     }
 
     fun resume(){
         xScope = 1
         gameStatus = GameStatus.PLAYING
-        targetColor = null
+        targetColors.clear()
         changeColor = null
-        score = 0
+        score = 100.0
     }
     fun roll(){
         generateRandomColor()

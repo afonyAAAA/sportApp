@@ -1,4 +1,4 @@
-package ru.fi.colorGame.models
+package ru.fi.sportapp.models
 
 import androidx.compose.ui.graphics.Color
 

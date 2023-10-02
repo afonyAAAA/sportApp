@@ -1,4 +1,4 @@
-package ru.fi.colorGame
+package ru.fi.sportapp
 
 import org.junit.Test
 
