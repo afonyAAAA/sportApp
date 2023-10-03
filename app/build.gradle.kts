@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "ru.fi.sportapp"
-    compileSdk = 33
+    namespace = "brazilian.sports.craze"
+    compileSdk = 34
 
     defaultConfig {
-        applicationId = "ru.fi.sportapp"
+        applicationId = "brazilian.sports.craze"
         minSdk = 21
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
