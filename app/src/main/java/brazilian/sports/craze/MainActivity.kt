@@ -184,11 +184,17 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ReallyApp(viewModel: GameViewModel){
 
-
     val context = LocalContext.current
     val clipBox = RoundedCornerShape(15.dp)
     val aniSpecFloat = tween<Float>(durationMillis = 500, delayMillis = 300)
     val numberFormat = NumberFormat.getNumberInstance(Locale.US)
+
+    Image(
+        painter = painterResource(id = R.drawable.background_app),
+        contentDescription = "",
+        contentScale = ContentScale.Crop,
+        modifier = Modifier.fillMaxSize()
+    )
 
     if(!viewModel.isStartGame){
         WelcomeFragment(text = stringResource(id = R.string.app_name)){
@@ -529,7 +535,6 @@ fun WelcomeFragment(
         var counterText by rememberSaveable { mutableStateOf(0) }
         var counterColor by rememberSaveable { mutableStateOf(0) }
         val colorList = listOf(
-            Color.Black,
             Color.Red,
             Color.Green,
             Color.Blue,
@@ -555,6 +560,7 @@ fun WelcomeFragment(
                 }
             },
             fontSize = 26.sp,
+            color = Color.White,
             fontWeight = FontWeight.ExtraBold,
         )
 

@@ -24,7 +24,7 @@ class GameViewModel : ViewModel() {
     var targetColors by mutableStateOf(mutableListOf<MyColor?>())
     var changeColor by mutableStateOf<MyColor?>(null)
     var score by mutableStateOf(100.0)
-    var numberStringBet by mutableStateOf("")
+    var numberStringBet by mutableStateOf("1")
     var showDialogAboutGame by mutableStateOf(false)
     var isStartGame by mutableStateOf(false)
 
