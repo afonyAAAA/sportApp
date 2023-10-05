@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<actors>
+    <actor>
+        <name>Cary Grant</name>
+        <description>Cary Grant, born Archibald Alexander Leach, was one of the most iconic actors of the Golden Age of Hollywood. He was born on January 18, 1904, in England, and began his film career in the 1930s. His photogenic appearance, sense of humor, and elegant style made him a household name. He starred in numerous successful films, such as "The Philadelphia Story" (1940), "Notorious" (1946), and "North by Northwest" (1959). Cary Grant was also known for his comedic chemistry with Katharine Hepburn in several films, and their pairing is considered one of the most popular in cinematic history. He passed away on November 29, 1986, leaving an indelible mark on the history of cinema.</description>
+        <urlToImage>https://prod-images.tcm.com/Master-Profile-Images/CaryGrant.jpg</urlToImage>
+    </actor>
+    <actor>
+        <name>Bette Davis</name>
+        <description>Bette Davis was an outstanding actress of the Golden Age of Hollywood. She was born on April 5, 1908, in Lowell, Massachusetts. Bette began her career in the 1930s and became known for her strong and often ambivalent female characters. Her films, such as "All About Eve" (1950) and "What Ever Happened to Baby Jane?" (1962), showcased her acting talent and ability to transform on screen. Bette Davis received two Academy Awards for Best Actress for her roles in "Dangerous" (1935) and "Jezebel" (1938). She passed away on October 6, 1989, leaving an enduring legacy in Hollywood drama.</description>
+        <urlToImage>https://upload.wikimedia.org/wikipedia/commons/4/46/BetteDavis1935.jpg</urlToImage>
+    </actor>
+    <actor>
+        <name>Humphrey Bogart</name>
+        <description>Humphrey Bogart, born on December 25, 1899, in New York City, was a legendary actor known for his tough-guy persona and distinctive voice. He rose to fame during the 1940s and 1950s with iconic roles in films like "Casablanca" (1942), where he portrayed the enigmatic Rick Blaine, and "The Maltese Falcon" (1941) as the private detective Sam Spade. Bogart's on-screen chemistry with Ingrid Bergman in "Casablanca" is still celebrated today. He became one of the most respected actors of his time and left an enduring legacy in the world of cinema. Humphrey Bogart passed away on January 14, 1957.</description>
+        <urlToImage>https://m.media-amazon.com/images/M/MV5BZDRiZWJjOTMtNzczMi00ZTIyLWJmNjAtMzlkNWU5ODc4NDk1XkEyXkFqcGdeQXVyMDc2NTEzMw@@._V1_FMjpg_UX1000_.jpg</urlToImage>
+    </actor>
+    <actor>
+        <name>Marilyn Monroe</name>
+        <description>Marilyn Monroe, born Norma Jeane Mortenson on June 1, 1926, in Los Angeles, California, remains an iconic figure in Hollywood history. She became a symbol of sensuality and glamour during the 1950s. Monroe's notable films include "Some Like It Hot" (1959), "The Seven Year Itch" (1955), and "Gentlemen Prefer Blondes" (1953). Her breathy voice, blonde curls, and captivating presence made her an enduring sex symbol. Despite her tragic death on August 5, 1962, Marilyn Monroe's influence on pop culture and her status as a Hollywood legend persist to this day.</description>
+        <urlToImage>https://m.media-amazon.com/images/M/MV5BMTczM2I1MjktMTdhYi00ZmU1LWE5N2ItNmUyYWMzOWY4NGNiXkEyXkFqcGdeQXVyMzQ3Nzk5MTU@._V1_.jpg</urlToImage>
+    </actor>
+    <actor>
+        <name></name>
+        <description></description>
+        <urlToImage></urlToImage>
+    </actor>
+    <actor>
+        <name></name>
+        <description></description>
+        <urlToImage></urlToImage>
+    </actor>
+    <actor>
+        <name></name>
+        <description></description>
+        <urlToImage></urlToImage>
+    </actor>
+    <actor>
+        <name></name>
+        <description></description>
+        <urlToImage></urlToImage>
+    </actor>
+</actors>
