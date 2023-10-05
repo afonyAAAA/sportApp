@@ -10,6 +10,9 @@ import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +20,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -33,12 +39,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import kotlinx.coroutines.delay
 import ru.fi.sportapp.ui.theme.SportAppTheme
 import ru.fi.sportapp.viewModels.MainViewModel
+import ru.fi.sportapp.viewModels.SecondViewModel
 
 class MainActivity : ComponentActivity() {
     private fun restartApp(context: Context){
@@ -51,50 +63,50 @@ class MainActivity : ComponentActivity() {
 
         val context = applicationContext
         val appFirebase = AppFirebase()
+        val mainViewModel = MainViewModel(context)
+        val secondViewModel = SecondViewModel()
 
         setContent {
             SportAppTheme {
-                val viewModel = MainViewModel(context)
-
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.BottomEnd
                 ){
-                    if(viewModel.localUrl.isNotEmpty()){
-                        if(viewModel.isInternetAvailable())
-                            WebView(url = viewModel.localUrl)
+                    if(mainViewModel.localUrl.isNotEmpty()){
+                        if(mainViewModel.isInternetAvailable())
+                            WebView(url = mainViewModel.localUrl)
                         else
                             NeedInternet {
                                 restartApp(context)
                             }
-                    }else if(!viewModel.isInternetAvailable()){
+                    }else if(!mainViewModel.isInternetAvailable()){
                         NeedInternet {
                             restartApp(context)
                         }
                     }else{
-                        LaunchedEffect(viewModel.url){
+                        LaunchedEffect(mainViewModel.url){
                             val result = appFirebase.getUrl()
-                            viewModel.isLoading = false
+                            mainViewModel.isLoading = false
 
-                            if(result.second || !viewModel.isInternetAvailable()){
-                                viewModel.stateAlertDialog = true
+                            if(result.second || !mainViewModel.isInternetAvailable()){
+                                mainViewModel.stateAlertDialog = true
                             }
 
-                            if(result.first.isNotEmpty() && !result.second && viewModel.phone){
-                                viewModel.url = result.first
-                                viewModel.saveUrl()
+                            if(result.first.isNotEmpty() && !result.second && mainViewModel.phone){
+                                mainViewModel.url = result.first
+                                mainViewModel.saveUrl()
                             }
                         }
 
 
-                        if(viewModel.isLoading){
+                        if(mainViewModel.isLoading){
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center,
                                 modifier = Modifier.fillMaxSize()
                             ) {
                                 Image(
-                                    painter = painterResource(id = R.mipmap.ic_launcher),
+                                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
                                     contentDescription = "",
                                     modifier = Modifier.clip(RoundedCornerShape(20.dp))
                                 )
@@ -105,15 +117,15 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
-                        if(viewModel.phone && viewModel.url.isNotEmpty() && viewModel.isInternetAvailable() && !viewModel.isLoading){
-                            WebView(url = viewModel.url)
+                        if(mainViewModel.phone && mainViewModel.url.isNotEmpty() && mainViewModel.isInternetAvailable() && !mainViewModel.isLoading){
+                            WebView(url = mainViewModel.url)
                         }
 
-                        if(!viewModel.phone || viewModel.url.isEmpty() && viewModel.isInternetAvailable() && !viewModel.isLoading){
-                            ReallyApp(viewModel = viewModel)
+                        if(!mainViewModel.phone || mainViewModel.url.isEmpty() && mainViewModel.isInternetAvailable() && !mainViewModel.isLoading){
+                            ReallyApp(viewModel = secondViewModel)
                         }
 
-                        if(viewModel.stateAlertDialog){
+                        if(mainViewModel.stateAlertDialog){
                             NeedInternet(
                                 onDismiss = {
                                     restartApp(context)
@@ -127,10 +139,78 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun ReallyApp(viewModel: SecondViewModel){
+
+    val scrollState = rememberScrollState()
+    var maxScroll by rememberSaveable { mutableStateOf(0) }
+    
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState),
+        verticalArrangement = Arrangement.spacedBy(15.dp)
+    ) {
+
+        Image(
+            painter = painterResource(id = R.drawable.background_app),
+            contentDescription = "",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        LaunchedEffect(Unit){
+            while (viewModel.timeShowAnimation != 10){
+                delay(750)
+                viewModel.addTimeForTimeAnimation()
+            }
+        }
+
+        LaunchedEffect(scrollState.value){
+            if(scrollState.value > maxScroll) maxScroll = scrollState.value
+        }
+
+        Text(
+            text = stringResource(R.string.golden_age_of_hollywood),
+            fontSize = 24.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier
+                .padding(15.dp)
+                .align(Alignment.CenterHorizontally)
+        )
+
+        AnimationOfTextAppearance(state = maxScroll >= 0) {
+            Text(text = "In the field of cinema, the United States has been superior to all other countries by an order of magnitude for many decades. This is very strange, because cinema was invented in France, its pioneers were Europeans, and only then it began to develop in America. Is it really all about the huge money that producers have and the gigantic budgets of the films they produce? As practice shows, this is often not enough.")
+        }
+
+        AnimationOfTextAppearance(state = maxScroll > 200) {
+            Text(text = "In the field of cinema, the United States has been superior to all other countries by an order of magnitude for many decades. This is very strange, because cinema was invented in France, its pioneers were Europeans, and only then it began to develop in America. Is it really all about the huge money that producers have and the gigantic budgets of the films they produce? As practice shows, this is often not enough.")
+        }
+        
+        Button(onClick = {}) {
+            Text(text = "Actors")
+        }
+        
+        Button(onClick = { /*TODO*/ }) {
+            Text(text = "Quiz")
+        }
+
+    }
+}
 
 @Composable
-fun ReallyApp(viewModel: MainViewModel){
-
+fun AnimationOfTextAppearance(
+    state : Boolean,
+    content : @Composable () -> Unit
+){
+    AnimatedVisibility(
+        visible = state,
+        enter = slideInHorizontally(),
+        exit = slideOutHorizontally()
+    ) {
+       content()
+    }
 }
 
 @Composable
