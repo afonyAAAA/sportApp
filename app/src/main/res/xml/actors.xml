@@ -2,43 +2,68 @@
 
 <actors>
     <actor>
-        <name>Cary Grant</name>
-        <description>Cary Grant, born Archibald Alexander Leach, was one of the most iconic actors of the Golden Age of Hollywood. He was born on January 18, 1904, in England, and began his film career in the 1930s. His photogenic appearance, sense of humor, and elegant style made him a household name. He starred in numerous successful films, such as "The Philadelphia Story" (1940), "Notorious" (1946), and "North by Northwest" (1959). Cary Grant was also known for his comedic chemistry with Katharine Hepburn in several films, and their pairing is considered one of the most popular in cinematic history. He passed away on November 29, 1986, leaving an indelible mark on the history of cinema.</description>
-        <urlToImage>https://prod-images.tcm.com/Master-Profile-Images/CaryGrant.jpg</urlToImage>
+        <name>Clark Gable</name>
+        <description>Born in 1901, Clark Gable was hailed as the "King of Hollywood." His portrayal of Rhett Butler in "Gone with the Wind" remains one of the most iconic performances in film history.</description>
+        <urlToImage>https://m.media-amazon.com/images/M/MV5BMjE1NDY5MjM5Ml5BMl5BanBnXkFtZTYwNTU1OTQ2._V1_FMjpg_UX1000_.jpg</urlToImage>
     </actor>
     <actor>
         <name>Bette Davis</name>
-        <description>Bette Davis was an outstanding actress of the Golden Age of Hollywood. She was born on April 5, 1908, in Lowell, Massachusetts. Bette began her career in the 1930s and became known for her strong and often ambivalent female characters. Her films, such as "All About Eve" (1950) and "What Ever Happened to Baby Jane?" (1962), showcased her acting talent and ability to transform on screen. Bette Davis received two Academy Awards for Best Actress for her roles in "Dangerous" (1935) and "Jezebel" (1938). She passed away on October 6, 1989, leaving an enduring legacy in Hollywood drama.</description>
+        <description>Born in 1908, Bette Davis was celebrated for her powerful and versatile acting. She appeared in classics like "All About Eve" and "What Ever Happened to Baby Jane?" and earned two Academy Awards during her illustrious career.</description>
         <urlToImage>https://upload.wikimedia.org/wikipedia/commons/4/46/BetteDavis1935.jpg</urlToImage>
     </actor>
     <actor>
+        <name>Audrey Hepburn</name>
+        <description>Born in 1929, Audrey Hepburn embodied elegance and grace. Her roles in "Breakfast at Tiffany's" and "Roman Holiday" made her an adored figure in both cinema and fashion.</description>
+        <urlToImage>https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Audrey_Hepburn_1959.jpg/1200px-Audrey_Hepburn_1959.jpg</urlToImage>
+    </actor>
+    <actor>
         <name>Humphrey Bogart</name>
-        <description>Humphrey Bogart, born on December 25, 1899, in New York City, was a legendary actor known for his tough-guy persona and distinctive voice. He rose to fame during the 1940s and 1950s with iconic roles in films like "Casablanca" (1942), where he portrayed the enigmatic Rick Blaine, and "The Maltese Falcon" (1941) as the private detective Sam Spade. Bogart's on-screen chemistry with Ingrid Bergman in "Casablanca" is still celebrated today. He became one of the most respected actors of his time and left an enduring legacy in the world of cinema. Humphrey Bogart passed away on January 14, 1957.</description>
+        <description>Born in 1899, Humphrey Bogart became an enduring Hollywood legend known for his tough-guy roles. He starred in iconic films like "Casablanca" and "The Maltese Falcon," and his stoic demeanor and distinctive style left an indelible mark on the film industry.</description>
         <urlToImage>https://m.media-amazon.com/images/M/MV5BZDRiZWJjOTMtNzczMi00ZTIyLWJmNjAtMzlkNWU5ODc4NDk1XkEyXkFqcGdeQXVyMDc2NTEzMw@@._V1_FMjpg_UX1000_.jpg</urlToImage>
     </actor>
     <actor>
+        <name>Cary Grant</name>
+        <description>Cary Grant, born in 1904, epitomized style and elegance. His roles in "North by Northwest" and "To Catch a Thief" solidified his status as one of Hollywood's most recognizable and beloved actors.</description>
+        <urlToImage>https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Cary_Grant_1940s_publicity_photo.jpg/1200px-Cary_Grant_1940s_publicity_photo.jpg</urlToImage>
+    </actor>
+    <actor>
+        <name>Katharine Hepburn</name>
+        <description>Born in 1907, Katharine Hepburn was an extraordinarily talented actress who won four Academy Awards. Her role in "The Philadelphia Story" is considered one of her finest.</description>
+        <urlToImage>https://www.catwalkyourself.com/wp-content/uploads/2012/08/catwalk_yourself_katherine_hepburn.jpeg</urlToImage>
+    </actor>
+    <actor>
         <name>Marilyn Monroe</name>
-        <description>Marilyn Monroe, born Norma Jeane Mortenson on June 1, 1926, in Los Angeles, California, remains an iconic figure in Hollywood history. She became a symbol of sensuality and glamour during the 1950s. Monroe's notable films include "Some Like It Hot" (1959), "The Seven Year Itch" (1955), and "Gentlemen Prefer Blondes" (1953). Her breathy voice, blonde curls, and captivating presence made her an enduring sex symbol. Despite her tragic death on August 5, 1962, Marilyn Monroe's influence on pop culture and her status as a Hollywood legend persist to this day.</description>
-        <urlToImage>https://m.media-amazon.com/images/M/MV5BMTczM2I1MjktMTdhYi00ZmU1LWE5N2ItNmUyYWMzOWY4NGNiXkEyXkFqcGdeQXVyMzQ3Nzk5MTU@._V1_.jpg</urlToImage>
+        <description>Born in 1926, Marilyn Monroe was the quintessential symbol of femininity and sensuality in Hollywood. Her performances in "Some Like It Hot" and "The Seven Year Itch" catapulted her to stardom, and her enigmatic presence continues to captivate audiences worldwide.</description>
+        <urlToImage>https://static.posters.cz/image/750/plakaty/marilyn-monroe-glamour-i4630.jpg</urlToImage>
     </actor>
     <actor>
-        <name></name>
-        <description></description>
-        <urlToImage></urlToImage>
+        <name>James Stewart</name>
+        <description>James Stewart, born in 1908, was known for his endearing characters and heartfelt performances. His roles in "It's a Wonderful Life" and "Mr. Smith Goes to Washington" continue to resonate with audiences.</description>
+        <urlToImage>https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Annex_-_Stewart%2C_James_%28Call_Northside_777%29_01.jpg/1200px-Annex_-_Stewart%2C_James_%28Call_Northside_777%29_01.jpg</urlToImage>
     </actor>
     <actor>
-        <name></name>
-        <description></description>
-        <urlToImage></urlToImage>
+        <name>John Wayne</name>
+        <description>John Wayne, born in 1907, became an iconic figure in the Western genre. His roles in films like "True Grit" and "Stagecoach" cemented his status as one of Hollywood's most recognizable actors.</description>
+        <urlToImage>https://upload.wikimedia.org/wikipedia/commons/7/7b/John_Wayne_-_still_portrait.jpg</urlToImage>
     </actor>
     <actor>
-        <name></name>
-        <description></description>
-        <urlToImage></urlToImage>
+        <name>Ingrid Bergman</name>
+        <description>Born in 1915, Ingrid Bergman was renowned for her talent and beauty. Her performances in "Casablanca" and "Notorious" solidified her place as one of the greatest actresses in cinematic history.</description>
+        <urlToImage>https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Ingrid_Bergman_-_Gaslight_44.jpg/274px-Ingrid_Bergman_-_Gaslight_44.jpg</urlToImage>
     </actor>
     <actor>
-        <name></name>
-        <description></description>
-        <urlToImage></urlToImage>
+        <name>Spencer Tracy</name>
+        <description>Born in 1900, Spencer Tracy was known for his versatility and naturalistic acting style. He starred in numerous classics, including "Guess Who's Coming to Dinner" and "It's a Mad, Mad, Mad, Mad World."</description>
+        <urlToImage>https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Spencer_tracy_state_of_the_union.jpg/1200px-Spencer_tracy_state_of_the_union.jpg</urlToImage>
+    </actor>
+    <actor>
+        <name>Joan Crawford</name>
+        <description>Born in 1904, Joan Crawford was a prominent actress known for her glamour and intensity. She won an Academy Award for her role in "Mildred Pierce" and became one of the leading actresses of her time.</description>
+        <urlToImage>https://upload.wikimedia.org/wikipedia/commons/3/32/Joan_Crawford_-_1936_-_Hurrell.JPG</urlToImage>
+    </actor>
+    <actor>
+        <name>Henry Fonda</name>
+        <description>Born in 1905, Henry Fonda was celebrated for his powerful performances and authenticity. He appeared in iconic films such as "12 Angry Men" and "The Grapes of Wrath," leaving a lasting legacy in Hollywood.</description>
+        <urlToImage>https://m.media-amazon.com/images/M/MV5BY2JiZGI0YjEtZDRkMi00NzU4LTk0M2UtZjk0MjlmODVhOWU1XkEyXkFqcGdeQXVyMDc2NTEzMw@@._V1_.jpg</urlToImage>
     </actor>
 </actors>

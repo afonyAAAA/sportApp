@@ -11,13 +11,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,15 +27,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.InlineTextContent
-import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -45,7 +42,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,32 +57,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.Placeholder
-import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.android.style.PlaceholderSpan
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.zIndex
-import androidx.lifecycle.viewmodel.viewModelFactory
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
+import kotlinx.coroutines.delay
 import ru.fi.sportapp.model.Actor
 import ru.fi.sportapp.ui.theme.SportAppTheme
-import ru.fi.sportapp.viewModels.MainViewModel
 import ru.fi.sportapp.viewModels.ArticleViewModel
+import ru.fi.sportapp.viewModels.MainViewModel
 
 class MainActivity : ComponentActivity() {
     private fun restartApp(context: Context){
@@ -175,12 +166,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ReallyApp(viewModel: ArticleViewModel){
-
-    val scrollState = rememberScrollState()
-    var maxScroll by rememberSaveable { mutableStateOf(0) }
 
     val painter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
@@ -190,36 +179,45 @@ fun ReallyApp(viewModel: ArticleViewModel){
             .build()
     )
 
+    var bol by rememberSaveable{
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(Unit){
+        delay(1000)
+        bol = true
+    }
+
     if(!viewModel.isStartQuiz && !viewModel.isShowActors){
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(15.dp)
+        AnimatedVisibility(
+            visible = bol,
+            enter = scaleIn()
         ) {
-
-            Image(
-                painter = painter,
-                contentDescription = "",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-
-            LaunchedEffect(scrollState.value){
-                if(scrollState.value > maxScroll) maxScroll = scrollState.value
-            }
-
-            Text(
-                text = stringResource(R.string.golden_age_of_hollywood),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.SemiBold,
+            Column(
                 modifier = Modifier
-                    .padding(top = 10.dp)
-                    .align(Alignment.CenterHorizontally)
-            )
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(15.dp)
+            ) {
 
-            viewModel.subTopics.forEach { subTopic ->
-                AnimationOfTextAppearance(state = true) {
+                Image(
+                    painter = painter,
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+
+                Text(
+                    text = stringResource(R.string.golden_age_of_hollywood),
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
+
+
+                viewModel.subTopics.forEach { subTopic ->
                     Column(
                         modifier = Modifier.padding(3.dp)
                     ) {
@@ -240,49 +238,120 @@ fun ReallyApp(viewModel: ArticleViewModel){
                             }
                             append(subTopic.text.drop(1))
                         })
+
+                        if(subTopic.name == "Legendary Stars"){
+                            ActorsItem(actor = viewModel.actors.first { it.name == "Marilyn Monroe"})
+
+                            ActorsItem(actor = viewModel.actors.first { it.name == "Audrey Hepburn"})
+                        }
                     }
                 }
-            }
 
-            Button(
-                onClick = {viewModel.isShowActors = true},
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .height(65.dp)
-                    .width(150.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
-                ){
-                    Text(text = "Actors")
-                    Icon(imageVector = Icons.Filled.Person, contentDescription = "")
-                }
-
-            }
-
-            Button(
-                onClick = { viewModel.isStartQuiz = true },
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .height(65.dp)
-                    .width(150.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+                Button(
+                    onClick = {
+                        viewModel.showActors()
+                    },
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .height(65.dp)
+                        .width(150.dp)
                 ) {
-                    Text(text = "Quiz")
-                    Icon(imageVector = Icons.Filled.Star, contentDescription = "")
-                }
-            }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+                    ){
+                        Text(text = "Actors")
+                        Icon(imageVector = Icons.Filled.Person, contentDescription = "")
+                    }
 
-            Spacer(modifier = Modifier.height(25.dp))
+                }
+
+                Button(
+                    onClick = {
+                        viewModel.startQuiz()
+                    },
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .height(65.dp)
+                        .width(150.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+                    ) {
+                        Text(text = "Quiz")
+                        Icon(imageVector = Icons.Filled.Star, contentDescription = "")
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(25.dp))
+            }
         }
     }else if(viewModel.isShowActors){
-        Actors(actors = viewModel.actors){viewModel.isShowActors = false}
+        Actors(actors = viewModel.actors){
+            viewModel.hideActors()
+        }
     }else{
-        Quiz()
+        if(viewModel.targetQuestion >= viewModel.questions.size - 1 && viewModel.variantsAnswers.isEmpty()){
+            ResultQuiz(viewModel = viewModel){
+                viewModel.completeQuiz()
+            }
+        }else{
+            Quiz(
+                viewModel = viewModel
+            ){ answer ->
+                viewModel.checkAnswer(answer)
+            }
+        }
+    }
+}
+
+@Composable
+fun ResultQuiz(
+    viewModel: ArticleViewModel,
+    onClick : () -> Unit
+){
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(25.dp, Alignment.CenterVertically)
+    ) {
+        Text(
+            text = "Quiz completed!",
+            fontSize = 23.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Text(
+            text = "${viewModel.countCorrectAnswer}/10",
+            fontSize = 20.sp
+        )
+        
+        Text(
+            text = when(viewModel.countCorrectAnswer){
+                in 0..3 -> "It’s worth reading carefully about the golden age of Hollywood again!"
+                in 4..7 -> "Not bad, but you can do better, you can try again"
+                else -> "That's famous!"
+            },
+            fontSize = 16.sp,
+            modifier = Modifier.padding(8.dp),
+            textAlign = TextAlign.Center
+        )
+        
+        Button(
+            onClick = {
+                 onClick()
+            },
+            modifier = Modifier
+                .height(50.dp)
+                .width(100.dp)
+        ) {
+            Text(text = "ОК")
+        }
+    }
+    BackHandler {
+        viewModel.questions.clear()
+        onClick()
     }
 }
 
@@ -315,13 +384,15 @@ fun ActorsItem(actor : Actor){
                         .clip(RoundedCornerShape(50))
                         .size(130.dp)
                 )
+
                 Spacer(modifier = Modifier.width(8.dp))
+
                 Text(text = actor.name, fontWeight = FontWeight.Black)
             }
             Text(
                 text = actor.description,
                 color = Color.Black,
-                fontSize = 16.sp,
+                fontSize = 16.sp
             )
         }
     }
@@ -338,6 +409,9 @@ fun Actors(
     ){
         items(actors){actor ->
             ActorsItem(actor = actor)
+        }
+        item {
+            Spacer(modifier = Modifier.height(50.dp))
         }
     }
     Box(contentAlignment = Alignment.BottomStart, modifier = Modifier.fillMaxSize()){
@@ -357,16 +431,64 @@ fun Actors(
     }
 }
 @Composable
-fun Quiz(){
+fun Quiz(
+    viewModel: ArticleViewModel,
+    onClick : (String) -> Unit
+){
+    val abcd = listOf("a", "b", "c", "d")
+    var counter = 0
+
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Surface {
+        Spacer(modifier = Modifier.height(25.dp))
 
-        }
-        LazyColumn{
+        Text(
+            text = "Quiz",
+            fontSize = 23.sp,
+            fontWeight = FontWeight.SemiBold
+        )
 
+        Spacer(modifier = Modifier.height(25.dp))
+
+        AnimatedVisibility(visible = viewModel.nextQuestion.targetState) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Surface(
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Text(text = viewModel.questions[viewModel.targetQuestion].textQuest)
+                }
+
+                LazyColumn{
+                    items(viewModel.variantsAnswers){ question ->
+                        Card(
+                            modifier = Modifier
+                                .clickable {
+                                    onClick(question)
+                                }
+                                .padding(8.dp)
+                                .height(50.dp)
+                                .fillMaxWidth()
+                        ) {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                                Text(text = "${abcd[counter]}) $question")
+                            }
+                        }
+                        counter++
+                        if(counter == 4) counter = 0
+                    }
+                }
+            }
         }
+    }
+
+
+    BackHandler {
+        viewModel.completeQuiz()
     }
 }
 

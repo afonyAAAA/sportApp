@@ -1,4 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-</PreferenceScreen>
+<questions>
+    <question>
+        <textQuestion>During what time period did the Golden Age of Hollywood take place?</textQuestion>
+        <correctAnswer>From the late 1920s to the early 1960s</correctAnswer>
+        <otherVariantsAnswer>
+            <answer>
+                1930-1940s
+            </answer>
+            <answer>
+                1950-1960s
+            </answer>
+            <answer>
+                1970-1980s
+            </answer>
+        </otherVariantsAnswer>
+    </question>
+    <question>
+        <textQuestion>Which system controlled all aspects of film production during the Golden Age of Hollywood?</textQuestion>
+        <correctAnswer>The studio system</correctAnswer>
+        <otherVariantsAnswer>
+            <answer>
+                The Academy system
+            </answer>
+            <answer>
+                The theater system
+            </answer>
+            <answer>
+                The agent system
+            </answer>
+        </otherVariantsAnswer>
+    </question>
+    <question>
+        <textQuestion>Which director was known for epic productions during the Golden Age of Hollywood?</textQuestion>
+        <correctAnswer>Cecil B. DeMille</correctAnswer>
+        <otherVariantsAnswer>
+            <answer>
+                Martin Scorsese
+            </answer>
+            <answer>
+                Steven Spielberg
+            </answer>
+            <answer>
+                Quentin Tarantino
+            </answer>
+        </otherVariantsAnswer>
+    </question>
+    <question>
+        <textQuestion>Which actress was known for her elegance and starred in films like "Breakfast at Tiffany's" and "Roman Holiday"?</textQuestion>
+        <correctAnswer>Audrey Hepburn</correctAnswer>
+        <otherVariantsAnswer>
+            <answer>
+                Marilyn Monroe
+            </answer>
+            <answer>
+                Bette Davis
+            </answer>
+            <answer>
+                Grace Kelly
+            </answer>
+        </otherVariantsAnswer>
+    </question>
+    <question>
+        <textQuestion>Which Golden Age of Hollywood film is considered an epic historical drama depicting the Civil War period in the United States?</textQuestion>
+        <correctAnswer>"Gone with the Wind"</correctAnswer>
+        <otherVariantsAnswer>
+            <answer>
+                "Casablanca"
+            </answer>
+            <answer>
+                "The Wizard of Oz"
+            </answer>
+            <answer>
+                "Psycho"
+            </answer>
+        </otherVariantsAnswer>
+    </question>
+    <question>
+        <textQuestion>What technological innovations transformed filmmaking during the Golden Age of Hollywood?</textQuestion>
+        <correctAnswer>Introduction of color film</correctAnswer>
+        <otherVariantsAnswer>
+            <answer>
+                Introduction of 3D effects
+            </answer>
+            <answer>
+                Introduction of virtual reality
+            </answer>
+            <answer>
+                Introduction of robot actors
+            </answer>
+        </otherVariantsAnswer>
+    </question>
+    <question>
+        <textQuestion>What impact did the Hays Code have on films during the Golden Age of Hollywood?</textQuestion>
+        <correctAnswer>Imposed strict censorship guidelines on film content</correctAnswer>
+        <otherVariantsAnswer>
+            <answer>
+                Allowed more explicit violence
+            </answer>
+            <answer>
+                Abolished film censorship
+            </answer>
+            <answer>
+                Encouraged the creation of artistic films
+            </answer>
+        </otherVariantsAnswer>
+    </question>
+    <question>
+        <textQuestion>What factor led to the end of the Golden Age of Hollywood?</textQuestion>
+        <correctAnswer>Emergence of television in the 1950s</correctAnswer>
+        <otherVariantsAnswer>
+            <answer>
+                Conclusion of actors' contracts
+            </answer>
+            <answer>
+                Rise in popularity of horror films
+            </answer>
+            <answer>
+                Introduction of multichannel sound
+            </answer>
+        </otherVariantsAnswer>
+    </question>
+    <question>
+        <textQuestion>What legacy of the Golden Age of Hollywood remains in modern cinema?</textQuestion>
+        <correctAnswer>Filmmaking techniques and storytelling methods</correctAnswer>
+        <otherVariantsAnswer>
+            <answer>
+                Influence on fashion styles
+            </answer>
+            <answer>
+                A fascination with horror films
+            </answer>
+            <answer>
+                Dependence on special effects
+            </answer>
+        </otherVariantsAnswer>
+    </question>
+    <question>
+        <textQuestion>Which director is considered a master of stories about the struggle </textQuestion>
+        <correctAnswer>Cecil B. DeMille</correctAnswer>
+        <otherVariantsAnswer>
+            <answer>
+                Quentin Tarantino
+            </answer>
+            <answer>
+                Alfred Hitchcock
+            </answer>
+            <answer>
+                Martin Scorsese
+            </answer>
+        </otherVariantsAnswer>
+    </question>
+</questions>
