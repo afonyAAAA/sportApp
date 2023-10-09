@@ -1,4 +1,4 @@
-package ru.fi.sportapp.viewModels
+package com.centurygold.hollywood.viewModels
 
 import android.content.Context
 import android.net.ConnectivityManager

@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "779443179120",
-    "project_id": "sportapp-3319e",
-    "storage_bucket": "sportapp-3319e.appspot.com"
+    "project_number": "367911429210",
+    "project_id": "efrtgy-c224e",
+    "storage_bucket": "efrtgy-c224e.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:779443179120:android:31ad9e4ea865d83304eeb5",
+        "mobilesdk_app_id": "1:367911429210:android:243aa3075d1262e5282463",
         "android_client_info": {
-          "package_name": "ru.fi.sportapp"
+          "package_name": "com.centurygold.hollywood"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC2JHRHxNST10Jdv02XRfnc_vPOvbqovJw"
+          "current_key": "AIzaSyBge9iPEt4ylLsggW2cldwYG0hZovCoCl0"
         }
       ],
       "services": {

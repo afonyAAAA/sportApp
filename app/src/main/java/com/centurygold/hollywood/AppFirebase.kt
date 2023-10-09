@@ -1,4 +1,4 @@
-package ru.fi.sportapp
+package com.centurygold.hollywood
 
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig

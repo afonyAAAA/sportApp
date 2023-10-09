@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "ru.fi.sportapp"
+    namespace = "com.centurygold.hollywood"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "ru.fi.sportapp"
+        applicationId = "com.centurygold.hollywood"
         minSdk = 21
         targetSdk = 34
         versionCode = 1

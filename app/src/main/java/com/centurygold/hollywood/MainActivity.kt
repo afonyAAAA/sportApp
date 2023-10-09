@@ -1,4 +1,4 @@
-package ru.fi.sportapp
+package com.centurygold.hollywood
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -16,6 +16,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -73,11 +74,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
+import com.centurygold.hollywood.model.Actor
+import com.centurygold.hollywood.ui.theme.SportAppTheme
+import com.centurygold.hollywood.viewModels.ArticleViewModel
+import com.centurygold.hollywood.viewModels.MainViewModel
 import kotlinx.coroutines.delay
-import ru.fi.sportapp.model.Actor
-import ru.fi.sportapp.ui.theme.SportAppTheme
-import ru.fi.sportapp.viewModels.ArticleViewModel
-import ru.fi.sportapp.viewModels.MainViewModel
 
 class MainActivity : ComponentActivity() {
     private fun restartApp(context: Context){
@@ -133,7 +134,7 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.fillMaxSize()
                             ) {
                                 Image(
-                                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                                    painter = painterResource(id = R.mipmap.ic_launcher_foreground),
                                     contentDescription = "",
                                     modifier = Modifier.clip(RoundedCornerShape(20.dp))
                                 )
@@ -173,7 +174,7 @@ fun ReallyApp(viewModel: ArticleViewModel){
 
     val painter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
-            .data(R.drawable.background_app)
+            .data(R.drawable.hollywood)
             .size(Size.ORIGINAL)
             .crossfade(true)
             .build()
@@ -381,6 +382,7 @@ fun ActorsItem(actor : Actor){
                     contentDescription = "",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
+                        .background(Color.Gray, RoundedCornerShape(50))
                         .clip(RoundedCornerShape(50))
                         .size(130.dp)
                 )

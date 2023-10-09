@@ -1,4 +1,4 @@
-package ru.fi.sportapp.ui.theme
+package com.centurygold.hollywood.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

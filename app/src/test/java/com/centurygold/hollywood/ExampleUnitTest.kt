@@ -1,4 +1,4 @@
-package ru.fi.sportapp
+package com.centurygold.hollywood
 
 import org.junit.Test
 

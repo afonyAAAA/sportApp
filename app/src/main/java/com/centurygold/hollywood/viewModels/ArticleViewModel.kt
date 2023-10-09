@@ -1,4 +1,4 @@
-package ru.fi.sportapp.viewModels
+package com.centurygold.hollywood.viewModels
 
 import android.content.Context
 import android.content.res.Resources
@@ -10,13 +10,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.centurygold.hollywood.R
+import com.centurygold.hollywood.model.Actor
+import com.centurygold.hollywood.model.Question
+import com.centurygold.hollywood.model.SubTopic
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.xmlpull.v1.XmlPullParser
-import ru.fi.sportapp.R
-import ru.fi.sportapp.model.Actor
-import ru.fi.sportapp.model.Question
-import ru.fi.sportapp.model.SubTopic
 
 class ArticleViewModel(private val context : Context) : ViewModel() {
 
