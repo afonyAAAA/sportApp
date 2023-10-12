@@ -29,9 +29,10 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import ru.fi.sportapp.viewModels.MainViewModel
 
 @Composable
-fun MainScreen(navHostController: NavHostController){
+fun MainScreen(navHostController: NavHostController, mainViewModel: MainViewModel){
     LazyRow{
         items(5){
             CardCasino()

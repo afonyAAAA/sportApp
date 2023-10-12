@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <casinos>
     <casino>
         <name-casino>Monte Carlo Casino</name-casino>
@@ -117,6 +116,206 @@
         <interesting-facts>
             <fact>Caesars Palace is famous for its central fountain and replica of Michelangelo's "David."</fact>
             <fact>The resort was featured in several films and television shows, contributing to its fame.</fact>
+        </interesting-facts>
+        <url-to-image-casino></url-to-image-casino>
+    </casino>
+
+    <casino>
+        <name-casino>The Bellagio</name-casino>
+        <location-name>Las Vegas, Nevada, USA</location-name>
+        <year-of-creation>1998</year-of-creation>
+        <articles>
+            <article>
+                <name-article>The Bellagio</name-article>
+                <text-article>
+                    The Bellagio, located in the heart of Las Vegas, is a world-famous luxury resort and casino that opened its doors in 1998. It is known for its elegance, iconic fountains, and high-end gaming experience, making it a must-visit destination for tourists.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+            <article>
+                <name-article>History of The Bellagio</name-article>
+                <text-article>
+                    Built on the site of the legendary Dunes Hotel, The Bellagio has redefined luxury in Las Vegas. With its spectacular fountains choreographed to music and a timeless design inspired by the Lake Como town of Bellagio in Italy, the resort has a rich history.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+            <article>
+                <name-article>Entertainment at The Bellagio</name-article>
+                <text-article>
+                    The Bellagio is renowned for its fine dining, including restaurants by celebrity chefs. It's also home to the Bellagio Conservatory and Botanical Gardens, an enchanting attraction that changes with the seasons. The resort's shows, such as the Cirque du Soleil production "O," are a testament to its commitment to entertainment.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+        </articles>
+        <interesting-facts>
+            <fact>The Bellagio's iconic fountains are choreographed to music, creating captivating displays.</fact>
+            <fact>The Bellagio's Gallery of Fine Art hosts rotating exhibits from world-renowned artists.</fact>
+        </interesting-facts>
+        <url-to-image-casino></url-to-image-casino>
+    </casino>
+
+    <casino>
+        <name-casino>Sun City</name-casino>
+        <location-name>North West Province, South Africa</location-name>
+        <year-of-creation>1979</year-of-creation>
+        <articles>
+            <article>
+                <name-article>Sun City</name-article>
+                <text-article>
+                    Sun City, located in the North West Province of South Africa, is a resort and casino complex that was established in 1979. Known for its unique blend of entertainment, gaming, and stunning natural surroundings, it's often referred to as Africa's Kingdom of Pleasure.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+            <article>
+                <name-article>History of Sun City</name-article>
+                <text-article>
+                    Sun City was created by hotel magnate Sol Kerzner. It has an intriguing history, with attractions like the Valley of the Waves, a man-made beach, and the famous Lost City golf course. The resort has a rich past, hosting various events and attracting visitors from all over the world.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+            <article>
+                <name-article>Entertainment at Sun City</name-article>
+                <text-article>
+                    Sun City offers a wide range of entertainment options, from golfing to safaris. The resort is known for its incredible water park, thrilling casinos, and the chance to explore the nearby Pilanesberg Game Reserve, making it a dream destination for adventure seekers and relaxation enthusiasts alike.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+        </articles>
+        <interesting-facts>
+            <fact>Sun City's Palace of the Lost City hotel is a legendary masterpiece of architecture.</fact>
+            <fact>The resort's Gary Player Country Club is a renowned golfing destination.</fact>
+        </interesting-facts>
+        <url-to-image-casino></url-to-image-casino>
+    </casino>
+
+    <casino>
+        <name-casino>The Borgata</name-casino>
+        <location-name>Atlantic City, New Jersey, USA</location-name>
+        <year-of-creation>2003</year-of-creation>
+        <articles>
+            <article>
+                <name-article>The Borgata</name-article>
+                <text-article>
+                    The Borgata, situated in Atlantic City, New Jersey, USA, is a prominent casino resort that opened in 2003. It has quickly become a beloved destination for gaming, entertainment, and relaxation, offering a taste of Las Vegas on the East Coast.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+            <article>
+                <name-article>History of The Borgata</name-article>
+                <text-article>
+                    The Borgata was a game-changer for Atlantic City, representing a new era of upscale casinos. It's known for its stylish design, high-quality dining, and a lively nightlife scene. The resort's arrival breathed new life into the city's gaming industry.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+            <article>
+                <name-article>Entertainment at The Borgata</name-article>
+                <text-article>
+                    The Borgata offers a range of entertainment options, including a lively casino floor, top-tier restaurants, and a vibrant nightlife scene. Guests can enjoy shows at the Borgata Event Center and unwind at the water club spa, creating a perfect blend of relaxation and excitement.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+        </articles>
+        <interesting-facts>
+            <fact>The Borgata's casino floor is one of the largest in Atlantic City, with various gaming options.</fact>
+            <fact>The resort's Gypsy Bar is a popular spot for live music and dancing.</fact>
+        </interesting-facts>
+        <url-to-image-casino></url-to-image-casino>
+    </casino>
+
+    <casino>
+        <name-casino>The Venetian Macao</name-casino>
+        <location-name>Macau, China</location-name>
+        <year-of-creation>2007</year-of-creation>
+        <articles>
+            <article>
+                <name-article>The Venetian Macao</name-article>
+                <text-article>
+                    The Venetian Macao, located in Macau, China, is a grand resort and casino complex that opened in 2007. It's a remarkable piece of architecture and a world-class destination, offering guests a taste of Venice with a touch of Chinese hospitality.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+            <article>
+                <name-article>History of The Venetian Macao</name-article>
+                <text-article>
+                    The Venetian Macao's construction marked a significant moment in Macau's transformation into a global gaming and entertainment hub. The resort's design is a tribute to Venice's charm, featuring canals, gondolas, and exquisite art. Since its opening, it has become an iconic symbol of Macau.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+            <article>
+                <name-article>Entertainment at The Venetian Macao</name-article>
+                <text-article>
+                    The resort is renowned for its vibrant casino, shopping mall, and entertainment options. Guests can experience a gondola ride through the resort's canals or enjoy world-class live performances. The Venetian Macao seamlessly combines luxury, art, and entertainment.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+        </articles>
+        <interesting-facts>
+            <fact>The Venetian Macao's casino is one of the largest in the world, offering a vast selection of games.</fact>
+            <fact>It's home to the Cotai Arena, a venue that hosts major sporting events and concerts.</fact>
+        </interesting-facts>
+        <url-to-image-casino></url-to-image-casino>
+    </casino>
+
+    <casino>
+        <name-casino>Foxwoods Resort Casino</name-casino>
+        <location-name>Mashantucket, Connecticut, USA</location-name>
+        <year-of-creation>1986</year-of-creation>
+        <articles>
+            <article>
+                <name-article>Foxwoods Resort Casino</name-article>
+                <text-article>
+                    Foxwoods Resort Casino, situated in Mashantucket, Connecticut, USA, has been captivating visitors since its opening in 1986. It's one of the largest resort casinos in North America, offering a diverse range of experiences, from gaming to entertainment.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+            <article>
+                <name-article>History of Foxwoods Resort Casino</name-article>
+                <text-article>
+                    Foxwoods Resort Casino has an interesting history. It's owned and operated by the Mashantucket Pequot Tribal Nation and has expanded over the years to include multiple hotels, restaurants, and entertainment venues. The casino's success has played a vital role in the tribe's economic development.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+            <article>
+                <name-article>Entertainment at Foxwoods Resort Casino</name-article>
+                <text-article>
+                    The casino offers a wide range of entertainment options, including concerts, comedy shows, and sporting events. The resort also features a championship golf course and the Tanger Outlets, making it a destination for both gamers and shoppers.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+        </articles>
+        <interesting-facts>
+            <fact>Foxwoods Resort Casino's Bingo Hall is one of the largest in the world.</fact>
+            <fact>The casino is home to several fine dining restaurants, catering to various culinary preferences.</fact>
         </interesting-facts>
         <url-to-image-casino></url-to-image-casino>
     </casino>

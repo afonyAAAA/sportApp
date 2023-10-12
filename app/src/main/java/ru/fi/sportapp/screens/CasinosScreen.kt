@@ -5,9 +5,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import ru.fi.sportapp.viewModels.MainViewModel
 
 @Composable
-fun CasinosScreen(navHostController: NavHostController){
+fun CasinosScreen(navHostController: NavHostController, mainViewModel: MainViewModel){
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ){

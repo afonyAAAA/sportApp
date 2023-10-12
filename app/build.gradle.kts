@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.gms.google-services")
 }
 
@@ -81,6 +82,11 @@ dependencies {
 
     //Nav depend
     implementation("androidx.navigation:navigation-compose:2.7.4")
+
+    implementation("io.github.pdvrieze.xmlutil:core-android:0.86.2")
+    implementation("io.github.pdvrieze.xmlutil:serialization-android:0.86.2")
+
 }
+
 
 
