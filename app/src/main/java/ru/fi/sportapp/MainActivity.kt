@@ -14,14 +14,30 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -33,12 +49,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import ru.fi.sportapp.navigation.NavApp
+import ru.fi.sportapp.navigation.Screens
 import ru.fi.sportapp.ui.theme.SportAppTheme
-import ru.fi.sportapp.viewModels.MainViewModel
+import ru.fi.sportapp.viewModels.LaunchViewModel
 
 class MainActivity : ComponentActivity() {
     private fun restartApp(context: Context){
@@ -51,11 +75,10 @@ class MainActivity : ComponentActivity() {
 
         val context = applicationContext
         val appFirebase = AppFirebase()
+        val viewModel = LaunchViewModel(context)
 
         setContent {
             SportAppTheme {
-                val viewModel = MainViewModel(context)
-
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.BottomEnd
@@ -94,7 +117,7 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.fillMaxSize()
                             ) {
                                 Image(
-                                    painter = painterResource(id = R.mipmap.ic_launcher),
+                                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
                                     contentDescription = "",
                                     modifier = Modifier.clip(RoundedCornerShape(20.dp))
                                 )
@@ -105,12 +128,14 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
-                        if(viewModel.phone && viewModel.url.isNotEmpty() && viewModel.isInternetAvailable() && !viewModel.isLoading){
-                            WebView(url = viewModel.url)
-                        }
+                        if(!viewModel.isLoading && viewModel.isInternetAvailable()){
+                            if(viewModel.phone && viewModel.url.isNotEmpty()){
+                                WebView(url = viewModel.url)
+                            }
 
-                        if(!viewModel.phone || viewModel.url.isEmpty() && viewModel.isInternetAvailable() && !viewModel.isLoading){
-                            ReallyApp(viewModel = viewModel)
+                            if(!viewModel.phone || viewModel.url.isEmpty()){
+                                ReallyApp()
+                            }
                         }
 
                         if(viewModel.stateAlertDialog){
@@ -128,10 +153,109 @@ class MainActivity : ComponentActivity() {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReallyApp(viewModel: MainViewModel){
+fun ReallyApp(){
 
+    val isFirstLaunch = LocalContext.current.getSharedPreferences("pref", Context.MODE_PRIVATE)
+        .getBoolean("first_launch", true)
+
+    val navHostController = rememberNavController()
+
+    @Composable
+    fun TopBar(){
+        CenterAlignedTopAppBar(
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                titleContentColor = MaterialTheme.colorScheme.inversePrimary,
+            ),
+            title = {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Image(
+                        painter = painterResource(id = R.drawable.crown),
+                        contentDescription = "",
+                        Modifier.size(25.dp)
+                    )
+                    Text(text = stringResource(id = R.string.app_name))
+                }
+            },
+            navigationIcon = {
+                IconButton(onClick = { }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Localized description",
+                        tint = MaterialTheme.colorScheme.inversePrimary
+                    )
+                }
+            },
+            modifier = Modifier.clip(RoundedCornerShape(bottomEnd = 10.dp, bottomStart = 15.dp))
+        )
+
+    }
+
+    @Composable
+    fun BottomBar(navHostController: NavHostController){
+
+        val items = listOf<Triple<Screens, String, ImageVector>>(
+            Triple(Screens.Main, "Main", Icons.Outlined.Home),
+            Triple(Screens.Casinos, "Casinos", Icons.Outlined.Star)
+        )
+        val navBackStackEntry by navHostController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
+
+        BottomAppBar(
+            actions = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(50.dp, Alignment.CenterHorizontally)
+                ) {
+                    items.forEach { item ->
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            IconButton(onClick = {
+                                if(currentRoute != item.first.route){
+                                    navHostController.navigate(item.first.route)
+                                }
+                            }, modifier = Modifier.size(50.dp)
+                            ) {
+                                Icon(
+                                    imageVector = item.third,
+                                    contentDescription = "",
+                                    modifier = Modifier.size(35.dp),
+                                    tint = if(item.first.route == currentRoute) Color.White else Color.White.copy(0.5f)
+                                )
+                            }
+                            Text(text = item.second)
+                        }
+
+                    }
+                }
+            },
+            modifier = Modifier.clip(RoundedCornerShape(topStart = 13.dp, topEnd = 13.dp)),
+            containerColor = MaterialTheme.colorScheme.primary
+        )
+    }
+
+    Scaffold(
+        topBar = {
+            TopBar()
+        },
+        bottomBar = {
+            BottomBar(navHostController = navHostController)
+        }
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize()
+        ){
+            NavApp(
+                startDestination = if(isFirstLaunch) Screens.Start.route else Screens.Main.route,
+                navHostController = navHostController
+            )
+        }
+    }
 }
+
 
 @Composable
 fun NeedInternet(onDismiss : () -> Unit){

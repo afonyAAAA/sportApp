@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<casinos>
+    <casino>
+        <name-casino>Monte Carlo Casino</name-casino>
+        <location-name>Monte Carlo, Monaco</location-name>
+        <year-of-creation>1863</year-of-creation>
+        <articles>
+            <article>
+                <name-article>Monte Carlo Casino</name-article>
+                <text-article>
+                    Monte Carlo Casino is one of the world's most famous and luxurious gambling establishments. Nestled in the heart of Monaco, it opened its doors in 1863. The casino's stunning architecture and elite clientele make it a symbol of wealth and extravagance.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+            <article>
+                <name-article>History of Monte Carlo Casino</name-article>
+                <text-article>
+                    The Monte Carlo Casino was designed by Charles Garnier, the same architect responsible for the Paris Opera House. It has a rich history of attracting European nobility and the global elite. Over the years, it has expanded to offer a variety of games and entertainment.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+            <article>
+                <name-article>Entertainment at Monte Carlo Casino</name-article>
+                <text-article>
+                    In addition to its renowned gambling rooms, Monte Carlo Casino offers a wide range of entertainment options. Guests can enjoy opera, ballet, and live music in the casino's grand theater. The casino also hosts various events and galas throughout the year.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+        </articles>
+        <interesting-facts>
+            <fact>The Monte Carlo Casino has appeared in numerous films, including James Bond movies.</fact>
+            <fact>It is illegal for citizens of Monaco to enter the casino, as they are not allowed to gamble there.</fact>
+        </interesting-facts>
+        <url-to-image-casino></url-to-image-casino>
+    </casino>
+
+    <casino>
+        <name-casino>MGM Grand</name-casino>
+        <location-name>Las Vegas, Nevada, USA</location-name>
+        <year-of-creation>1993</year-of-creation>
+        <articles>
+            <article>
+                <name-article>MGM Grand</name-article>
+                <text-article>
+                    The MGM Grand in Las Vegas is one of the largest and most famous casino resorts in the world. It opened in 1993 and has since become an iconic part of the Las Vegas Strip. The resort offers everything from gaming and entertainment to fine dining and nightlife.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+            <article>
+                <name-article>History of MGM Grand</name-article>
+                <text-article>
+                    The MGM Grand was initially built as the Marina Hotel in 1975 and later underwent extensive renovations and expansions. It is known for hosting major boxing events and concerts, attracting famous entertainers and athletes.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+            <article>
+                <name-article>Entertainment at MGM Grand</name-article>
+                <text-article>
+                    The MGM Grand is home to the MGM Grand Garden Arena, which hosts numerous concerts and sporting events. Guests can also enjoy the casino's nightlife with various bars and clubs.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+        </articles>
+        <interesting-facts>
+            <fact>The MGM Grand's famous lion statue is one of the most recognizable landmarks in Las Vegas.</fact>
+            <fact>The resort has a dedicated esports arena, highlighting the growing popularity of competitive gaming.</fact>
+        </interesting-facts>
+        <url-to-image-casino></url-to-image-casino>
+    </casino>
+
+    <casino>
+        <name-casino>Caesars Palace</name-casino>
+        <location-name>Las Vegas, Nevada, USA</location-name>
+        <year-of-creation>1966</year-of-creation>
+        <articles>
+            <article>
+                <name-article>Caesars Palace</name-article>
+                <text-article>
+                    Caesars Palace, located in the heart of the Las Vegas Strip, has been an iconic casino resort since its establishment in 1966. The resort is known for its luxurious Roman-themed architecture and an extensive range of entertainment and dining options.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+            <article>
+                <name-article>History of Caesars Palace</name-article>
+                <text-article>
+                    Caesars Palace was developed by Jay Sarno and Stanley Mallin. It quickly became a symbol of Las Vegas' extravagance and opulence, drawing in celebrities and high rollers. Over the years, it has expanded and modernized to keep up with the changing times.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+            <article>
+                <name-article>Entertainment at Caesars Palace</name-article>
+                <text-article>
+                    The resort offers a wide range of entertainment options, including world-class shows and concerts. The Colosseum at Caesars Palace has hosted legendary artists like Celine Dion and Elton John.
+                </text-article>
+                <url-image>
+                    <url></url>
+                </url-image>
+            </article>
+        </articles>
+        <interesting-facts>
+            <fact>Caesars Palace is famous for its central fountain and replica of Michelangelo's "David."</fact>
+            <fact>The resort was featured in several films and television shows, contributing to its fame.</fact>
+        </interesting-facts>
+        <url-to-image-casino></url-to-image-casino>
+    </casino>
+
+</casinos>
