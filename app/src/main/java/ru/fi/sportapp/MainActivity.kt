@@ -44,6 +44,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -59,6 +60,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import ru.fi.sportapp.models.Casino
 import ru.fi.sportapp.navigation.NavApp
 import ru.fi.sportapp.navigation.Screens
 import ru.fi.sportapp.ui.theme.SportAppTheme
@@ -160,6 +165,8 @@ fun ReallyApp(){
     val context = LocalContext.current
     val mainViewModel = MainViewModel(context)
     val navHostController = rememberNavController()
+    val navBackStackEntry by navHostController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
     @Composable
     fun TopBar(){
@@ -179,9 +186,18 @@ fun ReallyApp(){
                 }
             },
             navigationIcon = {
-                IconButton(onClick = { }) {
+
+                val icon = if (currentRoute != Screens.Main.route) {
+                    Icons.Filled.ArrowBack
+                } else {
+                    Icons.Outlined.Home // Иконка для возврата на главный экран, если уже находитесь на главной странице
+                }
+
+                IconButton(onClick = {
+                    navHostController.popBackStack()
+                }) {
                     Icon(
-                        imageVector = Icons.Filled.ArrowBack,
+                        imageVector = icon,
                         contentDescription = "Localized description",
                         tint = MaterialTheme.colorScheme.inversePrimary
                     )
@@ -199,8 +215,6 @@ fun ReallyApp(){
             Triple(Screens.Main, "Main", Icons.Outlined.Home),
             Triple(Screens.Casinos, "Casinos", Icons.Outlined.Star)
         )
-        val navBackStackEntry by navHostController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
 
         BottomAppBar(
             actions = {

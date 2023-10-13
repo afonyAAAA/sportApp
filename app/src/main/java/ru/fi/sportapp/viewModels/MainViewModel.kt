@@ -93,9 +93,9 @@ class MainViewModel(val context : Context) : ViewModel() {
                         "location-name" -> locationName = parser.nextText() ?: ""
                         "year-of-creation" -> yearOfCreation = parser.nextText() ?: ""
                         "articles" -> {
-                            while (parser.next() != XmlPullParser.END_TAG) {
+                            do {
+                                parser.next()
                                 if(parser.eventType == XmlPullParser.START_TAG && parser.name != "articles"){
-                                    if(parser.name == "article") parser.next()
                                     when (parser.name) {
                                         "name-article" -> nameArticle = parser.nextText() ?: ""
                                         "text-article" -> textArticle = parser.nextText() ?: ""
@@ -107,12 +107,16 @@ class MainViewModel(val context : Context) : ViewModel() {
                                             }
                                         }
                                     }
+                                }
+                                if(parser.eventType == XmlPullParser.END_TAG && parser.name == "article"){
                                     if(nameArticle.isNotEmpty() && textArticle.isNotEmpty() && urlImage.isNotEmpty()){
                                         val article = Article(nameArticle, textArticle, urlImage)
                                         articles.add(article)
                                     }
                                 }
                             }
+                            while (parser.name != "articles")
+
                         }
                         "short-description" -> shortDescription = parser.nextText() ?: ""
                         "interesting-facts" -> {
