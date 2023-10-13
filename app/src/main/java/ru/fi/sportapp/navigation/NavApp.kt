@@ -1,7 +1,6 @@
 package ru.fi.sportapp.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -19,16 +18,16 @@ sealed class Screens(val route : String){
 }
 
 @Composable
-fun NavApp(startDestination: String, navHostController: NavHostController){
-
-    val context = LocalContext.current
-    val mainViewModel = MainViewModel(context)
-
+fun NavApp(
+    startDestination: String,
+    navHostController: NavHostController,
+    mainViewModel: MainViewModel
+){
     NavHost(navController = navHostController, startDestination = startDestination){
         composable(
-            route = Screens.Start.route,
+            route = Screens.Start.route
         ){
-            StartScreen(navHostController = navHostController)
+            StartScreen(navHostController = navHostController, mainViewModel)
         }
         composable(Screens.Main.route){
             MainScreen(navHostController = navHostController, mainViewModel)

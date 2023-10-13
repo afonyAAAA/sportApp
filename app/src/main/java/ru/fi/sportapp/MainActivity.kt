@@ -63,6 +63,7 @@ import ru.fi.sportapp.navigation.NavApp
 import ru.fi.sportapp.navigation.Screens
 import ru.fi.sportapp.ui.theme.SportAppTheme
 import ru.fi.sportapp.viewModels.LaunchViewModel
+import ru.fi.sportapp.viewModels.MainViewModel
 
 class MainActivity : ComponentActivity() {
     private fun restartApp(context: Context){
@@ -152,14 +153,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReallyApp(){
 
-    val isFirstLaunch = LocalContext.current.getSharedPreferences("pref", Context.MODE_PRIVATE)
-        .getBoolean("first_launch", true)
-
+    val context = LocalContext.current
+    val mainViewModel = MainViewModel(context)
     val navHostController = rememberNavController()
 
     @Composable
@@ -235,22 +234,24 @@ fun ReallyApp(){
         )
     }
 
+
     Scaffold(
         topBar = {
-            TopBar()
+            if(!mainViewModel.isFirstLaunch) TopBar()
         },
         bottomBar = {
-            BottomBar(navHostController = navHostController)
+            if(!mainViewModel.isFirstLaunch) BottomBar(navHostController = navHostController)
         }
     ) {
         Box(
             modifier = Modifier
-                .padding(it)
+                .padding(top = it.calculateTopPadding())
                 .fillMaxSize()
         ){
             NavApp(
-                startDestination = if(isFirstLaunch) Screens.Start.route else Screens.Main.route,
-                navHostController = navHostController
+                startDestination = if(mainViewModel.isFirstLaunch) Screens.Start.route else Screens.Main.route,
+                navHostController = navHostController,
+                mainViewModel = mainViewModel
             )
         }
     }

@@ -1,25 +1,19 @@
 package ru.fi.sportapp.models
 
-import kotlinx.serialization.Serializable
 
-@Serializable
+
 data class Casino(
     val nameCasino: String,
+    val shortDescription : String,
     val locationName: String,
-    val yearOfCreation: Int,
+    val yearOfCreation: String,
     val articles: List<Article>,
     val interestingFacts: List<String>,
-    val urlToImageCasino: String
+    val urlImageCasino : String
 )
 
-@Serializable
 data class Article(
     val nameArticle: String,
     val textArticle: String,
-    val urlImage: UrlImage
-)
-
-@Serializable
-data class UrlImage(
-    val url: String
+    val urlImage : List<String>
 )

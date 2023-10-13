@@ -38,6 +38,7 @@
             <fact>It is illegal for citizens of Monaco to enter the casino, as they are not allowed to gamble there.</fact>
         </interesting-facts>
         <url-to-image-casino></url-to-image-casino>
+        <short-description>аааааа</short-description>
     </casino>
 
     <casino>
@@ -78,6 +79,7 @@
             <fact>The resort has a dedicated esports arena, highlighting the growing popularity of competitive gaming.</fact>
         </interesting-facts>
         <url-to-image-casino></url-to-image-casino>
+        <short-description>аааааа</short-description>
     </casino>
 
     <casino>
@@ -118,6 +120,7 @@
             <fact>The resort was featured in several films and television shows, contributing to its fame.</fact>
         </interesting-facts>
         <url-to-image-casino></url-to-image-casino>
+        <short-description>аааааа</short-description>
     </casino>
 
     <casino>
@@ -158,6 +161,7 @@
             <fact>The Bellagio's Gallery of Fine Art hosts rotating exhibits from world-renowned artists.</fact>
         </interesting-facts>
         <url-to-image-casino></url-to-image-casino>
+        <short-description>аааааа</short-description>
     </casino>
 
     <casino>
@@ -198,6 +202,7 @@
             <fact>The resort's Gary Player Country Club is a renowned golfing destination.</fact>
         </interesting-facts>
         <url-to-image-casino></url-to-image-casino>
+        <short-description>аааааа</short-description>
     </casino>
 
     <casino>
@@ -238,6 +243,7 @@
             <fact>The resort's Gypsy Bar is a popular spot for live music and dancing.</fact>
         </interesting-facts>
         <url-to-image-casino></url-to-image-casino>
+        <short-description>аааааа</short-description>
     </casino>
 
     <casino>
@@ -278,6 +284,7 @@
             <fact>It's home to the Cotai Arena, a venue that hosts major sporting events and concerts.</fact>
         </interesting-facts>
         <url-to-image-casino></url-to-image-casino>
+        <short-description>аааааа</short-description>
     </casino>
 
     <casino>
@@ -318,6 +325,6 @@
             <fact>The casino is home to several fine dining restaurants, catering to various culinary preferences.</fact>
         </interesting-facts>
         <url-to-image-casino></url-to-image-casino>
+        <short-description>аааааа</short-description>
     </casino>
-
 </casinos>

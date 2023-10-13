@@ -6,8 +6,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,13 +18,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,15 +36,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import ru.fi.sportapp.navigation.Screens
+import ru.fi.sportapp.viewModels.MainViewModel
 
 @Composable
-fun StartScreen(navHostController: NavHostController){
+fun StartScreen(navHostController: NavHostController, mainViewModel: MainViewModel){
 
     val sp = LocalContext.current.getSharedPreferences("pref", Context.MODE_PRIVATE)
 
     var counter by rememberSaveable { mutableIntStateOf(0) }
+
+    val scope = rememberCoroutineScope()
 
     val factsCasino : List<String> = listOf(
         "The largest casino win was recorded in 2003 when a man named Archie Karas won over \$39 million at the MGM Grand Casino in Las Vegas, while playing slot machines.",
@@ -51,17 +59,9 @@ fun StartScreen(navHostController: NavHostController){
 
     var nextFact by rememberSaveable { mutableStateOf(true) }
 
-    LaunchedEffect(counter){
-        if(counter in 1..1){
-            nextFact = false
-            delay(1000)
-            nextFact = true
-        }
-    }
-
     Column(
         modifier = Modifier
-            .background(Color.Blue.copy(0.8f))
+            .background(MaterialTheme.colorScheme.primary)
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(15.dp, Alignment.CenterVertically)
     ) {
@@ -76,28 +76,37 @@ fun StartScreen(navHostController: NavHostController){
                 lineHeight = 70.sp,
                 text = "Did you know?",
                 fontSize = 60.sp,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
 
-        AnimatedVisibility(
-            visible = nextFact,
-            exit = slideOutHorizontally(targetOffsetX = {it}) + fadeOut(),
-            enter = slideInHorizontally() + fadeIn(),
-        ) {
-            Surface(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                color = Color.Blue
-            ) {
-                Text(
-                    text = if(counter <= 2) factsCasino[counter] else "",
-                    modifier = Modifier.padding(13.dp),
-                    fontSize = 15.sp,
-                    color = Color.White
-                )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(175.dp, 200.dp)
+        ){
+            Column {
+                AnimatedVisibility(
+                    visible = nextFact,
+                    exit =  slideOutHorizontally(targetOffsetX = {it}) + fadeOut(),
+                    enter = slideInHorizontally() + fadeIn(),
+                ) {
+                    Surface(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp),
+                        color = MaterialTheme.colorScheme.primary
+                    ) {
+                        Text(
+                            text = if(counter <= 2) factsCasino[counter] else "",
+                            modifier = Modifier.padding(13.dp),
+                            fontSize = 15.sp,
+                            color = Color.White
+                        )
+                    }
+                }
+
             }
         }
 
@@ -113,10 +122,23 @@ fun StartScreen(navHostController: NavHostController){
 
                     sp.edit().putBoolean("first_launch", false).apply()
 
+                    mainViewModel.checkFirstLaunch()
+                }else{
+                    scope.launch(Dispatchers.IO) {
+                        if(counter in 0..1){
+                            nextFact = false
+                            delay(1500)
+                            counter++
+                            nextFact = true
+                        }
+                    }
                 }
-                else counter++
             },
-            modifier = Modifier.heightIn(60.dp).widthIn(200.dp).align(Alignment.CenterHorizontally)
+            border = BorderStroke(3.dp, MaterialTheme.colorScheme.onPrimary),
+            modifier = Modifier
+                .heightIn(60.dp)
+                .widthIn(200.dp)
+                .align(Alignment.CenterHorizontally)
         ) {
             Text(
                 text = "Next",

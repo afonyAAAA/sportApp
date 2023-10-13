@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.gms.google-services")
 }
 
@@ -79,13 +78,8 @@ dependencies {
     implementation("io.coil-kt:coil-gif:2.0.0-rc02")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-
     //Nav depend
     implementation("androidx.navigation:navigation-compose:2.7.4")
-
-    implementation("io.github.pdvrieze.xmlutil:core-android:0.86.2")
-    implementation("io.github.pdvrieze.xmlutil:serialization-android:0.86.2")
-
 }
 
 
