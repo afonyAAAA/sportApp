@@ -44,7 +44,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -60,10 +59,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import ru.fi.sportapp.models.Casino
 import ru.fi.sportapp.navigation.NavApp
 import ru.fi.sportapp.navigation.Screens
 import ru.fi.sportapp.ui.theme.SportAppTheme
@@ -194,15 +189,7 @@ fun ReallyApp(){
 
                 IconButton(onClick = {
                     if(currentRoute != Screens.Main.route){
-                        Helper.selectedCasino = Casino(
-                                "",
-                        "",
-                        "",
-                        "",
-                        emptyList(),
-                        emptyList(),
-                        ""
-                        )
+                        Helper.isClickedCardCasino = false
                         navHostController.popBackStack()
                     }
                 }) {

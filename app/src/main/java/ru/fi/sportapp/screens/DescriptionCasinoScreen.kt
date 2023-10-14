@@ -3,26 +3,20 @@ package ru.fi.sportapp.screens
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,9 +28,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
@@ -51,19 +43,27 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.placeholder
+import com.google.accompanist.placeholder.shimmer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.fi.sportapp.Helper
-import java.util.Timer
 
 @Composable
 fun DescriptionCasinoScreen(navHostController: NavHostController) {
 
     val selectedCasino = Helper.selectedCasino
+
     var stateAnimation by rememberSaveable {
         mutableStateOf(false)
     }
+
+    var stateLoadImage by rememberSaveable {
+        mutableStateOf(true)
+    }
+
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit){
@@ -116,7 +116,23 @@ fun DescriptionCasinoScreen(navHostController: NavHostController) {
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(selectedCasino.urlImageCasino)
                         .crossfade(true)
-                        .build()
+                        .build(),
+                    onState = { state ->
+                        stateLoadImage = when(state){
+                            AsyncImagePainter.State.Empty -> {
+                                true
+                            }
+                            is AsyncImagePainter.State.Loading -> {
+                                true
+                            }
+                            is AsyncImagePainter.State.Success -> {
+                                false
+                            }
+                            is AsyncImagePainter.State.Error -> {
+                                true
+                            }
+                        }
+                    }
                 )
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -125,39 +141,31 @@ fun DescriptionCasinoScreen(navHostController: NavHostController) {
                     Text(
                         text = selectedCasino.nameCasino,
                         fontSize = 24.sp,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(20.dp)
                     )
 
-                    Box(
-                        modifier = Modifier.fillMaxWidth()
-                    ){
-                        Image(
-                            painter = painter,
-                            contentDescription = "",
-                            alignment = Alignment.TopCenter
-                        )
-                        when(painter.state){
-                            AsyncImagePainter.State.Empty -> {}
-                            is AsyncImagePainter.State.Loading -> {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.align(Alignment.Center)
-                                )
-                            }
-                            is AsyncImagePainter.State.Success -> {
+                    Image(
+                        painter = painter,
+                        contentDescription = "",
+                        alignment = Alignment.TopCenter,
+                        modifier = Modifier
+                            .padding(18.dp)
+                            .placeholder(
+                                visible = stateLoadImage,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                highlight = PlaceholderHighlight.shimmer(
+                                    highlightColor = MaterialTheme.colorScheme.primary.copy(
+                                        0.5f
+                                    )
+                                ),
+                                shape = RoundedCornerShape(20.dp)
+                            )
+                            .clip(RoundedCornerShape(20.dp))
+                            .fillMaxWidth()
+                            .heightIn(200.dp, 300.dp)
+                    )
 
-                            }
-                            is AsyncImagePainter.State.Error -> {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
-                                ) {
-                                    Icon(imageVector = Icons.Outlined.Close, contentDescription = "")
-                                    Text("Failed to load :(")
-                                }
-
-                            }
-                        }
-                    }
                 }
             }
             items(selectedCasino.articles){ article ->
@@ -189,11 +197,29 @@ fun DescriptionCasinoScreen(navHostController: NavHostController) {
 
                                 Image(
                                     painter = painter,
-                                    contentDescription = ""
+                                    contentDescription = "",
+                                    alignment = Alignment.TopCenter,
+                                    modifier = Modifier
+                                        .placeholder(
+                                            visible = stateLoadImage,
+                                            color = MaterialTheme.colorScheme.onPrimary,
+                                            highlight = PlaceholderHighlight.shimmer(
+                                                highlightColor = MaterialTheme.colorScheme.primary.copy(
+                                                    0.5f
+                                                )
+                                            ),
+                                            shape = RoundedCornerShape(20.dp)
+                                        )
+                                        .padding(13.dp)
+                                        .clip(RoundedCornerShape(20.dp))
+                                        .fillMaxWidth()
+                                        .heightIn(200.dp, 250.dp)
                                 )
                             }
                         }
                     }
+
+                    Spacer(modifier = Modifier.heightIn(50.dp))
                 }
             }
         }

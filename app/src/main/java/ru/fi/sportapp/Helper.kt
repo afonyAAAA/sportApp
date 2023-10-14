@@ -12,4 +12,5 @@ object Helper {
         emptyList(),
         ""
     )
+    var isClickedCardCasino : Boolean = false
 }

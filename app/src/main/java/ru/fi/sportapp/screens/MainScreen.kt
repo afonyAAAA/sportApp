@@ -2,7 +2,6 @@ package ru.fi.sportapp.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,7 +27,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,13 +45,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.Coil
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import coil.request.SuccessResult
 import com.google.accompanist.placeholder.PlaceholderHighlight
-import com.google.accompanist.placeholder.fade
 import com.google.accompanist.placeholder.placeholder
 import com.google.accompanist.placeholder.shimmer
 import ru.fi.sportapp.Helper
@@ -92,7 +87,8 @@ fun CasinosFragment(viewModel: MainViewModel, navHostController: NavHostControll
     LazyRow(horizontalArrangement = Arrangement.Center){
         items(viewModel.casinos){ casino ->
             CardCasino(casino){
-                if(Helper.selectedCasino.nameCasino.isEmpty()){
+                if(!Helper.isClickedCardCasino){
+                    Helper.isClickedCardCasino = true
                     Helper.selectedCasino = casino
                     navHostController.navigate(Screens.DescriptionCasino.route)
                 }
@@ -142,39 +138,49 @@ fun ArticleFragment(article: List<Article>){
 
 }
 
-
-
 @Composable
 fun CardCasino(
     casino : Casino,
     onClick : () -> Unit
 ){
+    var stateLoadImage by rememberSaveable{
+        mutableStateOf(true)
+    }
 
     val painter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
             .data(casino.urlImageCasino)
             .build(),
         onState = { state ->
-            when(state){
-                AsyncImagePainter.State.Empty -> {}
-                is AsyncImagePainter.State.Loading -> {}
-                is AsyncImagePainter.State.Success -> {}
-                is AsyncImagePainter.State.Error -> {}
+            stateLoadImage = when(state){
+                AsyncImagePainter.State.Empty -> {
+                    true
+                }
+
+                is AsyncImagePainter.State.Loading -> {
+                    true
+                }
+
+                is AsyncImagePainter.State.Success -> {
+                    false
+                }
+
+                is AsyncImagePainter.State.Error -> {
+                    true
+                }
             }
         }
     )
-    var stateLoadImage by rememberSaveable{
-        mutableStateOf(true)
-    }
 
-    LaunchedEffect(painter.state){
-        when(painter.state){
-            AsyncImagePainter.State.Empty -> {stateLoadImage = true}
-            is AsyncImagePainter.State.Loading -> {stateLoadImage = true}
-            is AsyncImagePainter.State.Success -> {stateLoadImage = false}
-            is AsyncImagePainter.State.Error -> {stateLoadImage = true}
-        }
-    }
+
+//    LaunchedEffect(painter.state){
+//        when(painter.state){
+//            AsyncImagePainter.State.Empty -> {stateLoadImage = true}
+//            is AsyncImagePainter.State.Loading -> {stateLoadImage = true}
+//            is AsyncImagePainter.State.Success -> {stateLoadImage = false}
+//            is AsyncImagePainter.State.Error -> {stateLoadImage = true}
+//        }
+//    }
 
     Card(
         modifier = Modifier
@@ -207,8 +213,8 @@ fun CardCasino(
                     modifier = Modifier
                         .placeholder(
                             visible = stateLoadImage,
-                            color = Color.Gray,
-                            highlight = PlaceholderHighlight.fade(highlightColor = Color.White.copy(0.7f)),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            highlight = PlaceholderHighlight.shimmer(highlightColor = MaterialTheme.colorScheme.primary.copy(0.5f)),
                             shape = cornerShape
                         )
                         .size(150.dp)
