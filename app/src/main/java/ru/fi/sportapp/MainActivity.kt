@@ -186,7 +186,6 @@ fun ReallyApp(){
                 }
             },
             navigationIcon = {
-
                 val icon = if (currentRoute != Screens.Main.route) {
                     Icons.Filled.ArrowBack
                 } else {
@@ -194,7 +193,18 @@ fun ReallyApp(){
                 }
 
                 IconButton(onClick = {
-                    navHostController.popBackStack()
+                    if(currentRoute != Screens.Main.route){
+                        Helper.selectedCasino = Casino(
+                                "",
+                        "",
+                        "",
+                        "",
+                        emptyList(),
+                        emptyList(),
+                        ""
+                        )
+                        navHostController.popBackStack()
+                    }
                 }) {
                     Icon(
                         imageVector = icon,

@@ -17,8 +17,10 @@ fun CasinosScreen(navHostController: NavHostController, mainViewModel: MainViewM
     ){
         items(mainViewModel.casinos){ casino ->
             CardCasino(casino){
-                Helper.selectedCasino = casino
-                navHostController.navigate(Screens.DescriptionCasino.route)
+                if(Helper.selectedCasino.nameCasino.isEmpty()){
+                    Helper.selectedCasino = casino
+                    navHostController.navigate(Screens.DescriptionCasino.route)
+                }
             }
         }
     }

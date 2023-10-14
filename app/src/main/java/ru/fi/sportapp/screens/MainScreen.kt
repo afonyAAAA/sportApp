@@ -28,9 +28,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,9 +47,15 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.Coil
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import coil.request.SuccessResult
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.fade
+import com.google.accompanist.placeholder.placeholder
+import com.google.accompanist.placeholder.shimmer
 import ru.fi.sportapp.Helper
 import ru.fi.sportapp.models.Article
 import ru.fi.sportapp.models.Casino
@@ -69,7 +77,9 @@ fun MainScreen(navHostController: NavHostController, mainViewModel: MainViewMode
         }
         Button(
             onClick = { shouldShowCasinos = !shouldShowCasinos},
-            modifier = Modifier.width(200.dp).align(Alignment.CenterHorizontally)
+            modifier = Modifier
+                .width(200.dp)
+                .align(Alignment.CenterHorizontally)
         ) {
             Icon(imageVector = if(shouldShowCasinos) Icons.Outlined.KeyboardArrowUp else Icons.Outlined.KeyboardArrowDown, contentDescription = "")
         }
@@ -82,8 +92,10 @@ fun CasinosFragment(viewModel: MainViewModel, navHostController: NavHostControll
     LazyRow(horizontalArrangement = Arrangement.Center){
         items(viewModel.casinos){ casino ->
             CardCasino(casino){
-                Helper.selectedCasino = casino
-                navHostController.navigate(Screens.DescriptionCasino.route)
+                if(Helper.selectedCasino.nameCasino.isEmpty()){
+                    Helper.selectedCasino = casino
+                    navHostController.navigate(Screens.DescriptionCasino.route)
+                }
             }
         }
     }
@@ -151,6 +163,18 @@ fun CardCasino(
             }
         }
     )
+    var stateLoadImage by rememberSaveable{
+        mutableStateOf(true)
+    }
+
+    LaunchedEffect(painter.state){
+        when(painter.state){
+            AsyncImagePainter.State.Empty -> {stateLoadImage = true}
+            is AsyncImagePainter.State.Loading -> {stateLoadImage = true}
+            is AsyncImagePainter.State.Success -> {stateLoadImage = false}
+            is AsyncImagePainter.State.Error -> {stateLoadImage = true}
+        }
+    }
 
     Card(
         modifier = Modifier
@@ -181,14 +205,20 @@ fun CardCasino(
                     painter = painter,
                     contentDescription = "",
                     modifier = Modifier
+                        .placeholder(
+                            visible = stateLoadImage,
+                            color = Color.Gray,
+                            highlight = PlaceholderHighlight.fade(highlightColor = Color.White.copy(0.7f)),
+                            shape = cornerShape
+                        )
                         .size(150.dp)
-                        .background(MaterialTheme.colorScheme.onPrimary, cornerShape)
                         .clip(cornerShape)
                 )
                 Text(
                     text = casino.shortDescription,
                     fontSize = 12.sp,
-                    modifier = Modifier.padding(top = 20.dp)
+                    modifier = Modifier.padding(top = 20.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
 

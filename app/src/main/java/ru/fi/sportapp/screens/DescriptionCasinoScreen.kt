@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,6 +48,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import kotlinx.coroutines.Dispatchers
@@ -122,11 +128,36 @@ fun DescriptionCasinoScreen(navHostController: NavHostController) {
                         textAlign = TextAlign.Center
                     )
 
-                    Image(
-                        painter = painter,
-                        contentDescription = "",
-                        alignment = Alignment.TopCenter
-                    )
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ){
+                        Image(
+                            painter = painter,
+                            contentDescription = "",
+                            alignment = Alignment.TopCenter
+                        )
+                        when(painter.state){
+                            AsyncImagePainter.State.Empty -> {}
+                            is AsyncImagePainter.State.Loading -> {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.align(Alignment.Center)
+                                )
+                            }
+                            is AsyncImagePainter.State.Success -> {
+
+                            }
+                            is AsyncImagePainter.State.Error -> {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
+                                ) {
+                                    Icon(imageVector = Icons.Outlined.Close, contentDescription = "")
+                                    Text("Failed to load :(")
+                                }
+
+                            }
+                        }
+                    }
                 }
             }
             items(selectedCasino.articles){ article ->

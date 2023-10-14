@@ -80,6 +80,8 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     //Nav depend
     implementation("androidx.navigation:navigation-compose:2.7.4")
+
+    implementation("com.google.accompanist:accompanist-placeholder:0.33.2-alpha")
 }
 
 
