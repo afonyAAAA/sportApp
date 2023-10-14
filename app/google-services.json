@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "779443179120",
-    "project_id": "sportapp-3319e",
-    "storage_bucket": "sportapp-3319e.appspot.com"
+    "project_number": "430614499615",
+    "project_id": "glorluckglo",
+    "storage_bucket": "glorluckglo.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:779443179120:android:31ad9e4ea865d83304eeb5",
+        "mobilesdk_app_id": "1:430614499615:android:34c57ce04ef28eef8da02a",
         "android_client_info": {
-          "package_name": "ru.fi.sportapp"
+          "package_name": "com.lucky.glo"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC2JHRHxNST10Jdv02XRfnc_vPOvbqovJw"
+          "current_key": "AIzaSyDLrGBSZP3G6NyID-5bgzrpNJKHrh_JjfQ"
         }
       ],
       "services": {

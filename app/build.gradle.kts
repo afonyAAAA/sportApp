@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "ru.fi.sportapp"
+    namespace = "com.lucky.glo"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "ru.fi.sportapp"
+        applicationId = "com.lucky.glo"
         minSdk = 21
         targetSdk = 34
         versionCode = 1
