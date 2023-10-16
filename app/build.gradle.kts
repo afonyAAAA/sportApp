@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.lucky.glo"
+    namespace = "ru.fi.sportapp"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.lucky.glo"
+        applicationId = "ru.fi.sportapp"
         minSdk = 21
         targetSdk = 34
         versionCode = 1
@@ -83,6 +83,9 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.4")
 
     implementation("com.google.accompanist:accompanist-placeholder:0.33.2-alpha")
+
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+
 }
 
 
