@@ -1,4 +1,4 @@
-package ru.fi.sportapp.viewModels
+package ru.fi.sportapp.screens.Main
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -20,11 +20,7 @@ class MainViewModel(private val context: Context) : ViewModel() {
     var isLoading by mutableStateOf(true)
     val localUrl = checkLocalUrl()
     val phone = checkIsEmu()
-    val listImage : MutableList<Bitmap> = mutableListOf()
-    val image = BitmapFactory.decodeResource(context.resources, R.drawable.cat)
-    init {
-        listImage.addAll(splitImage(image, 3, 3))
-    }
+
     private fun checkIsEmu(): Boolean {
         if (BuildConfig.DEBUG) return false
         val phoneModel = Build.MODEL
@@ -53,26 +49,6 @@ class MainViewModel(private val context: Context) : ViewModel() {
                 || buildProduct.lowercase(Locale.getDefault()).contains("nox")
 
         return !isEmulator
-    }
-
-    fun splitImage(image: Bitmap, rows: Int, columns: Int) : List<Bitmap>{
-        val imageWidth = image.width
-        val imageHeight = image.height
-        val tileWidth = imageWidth / columns
-        val tileHeight = imageHeight / rows
-
-        val tiles = mutableListOf<Bitmap>()
-
-        for (row in 0 until rows) {
-            for (col in 0 until columns) {
-                val x = col * tileWidth
-                val y = row * tileHeight
-                val tile = Bitmap.createBitmap(image, x, y, tileWidth, tileHeight)
-                tiles.add(tile)
-            }
-        }
-
-        return tiles
     }
 
     fun saveUrl(){

@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -37,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -44,8 +46,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import ru.fi.sportapp.models.SnapZone
+import ru.fi.sportapp.navigation.NavPuzzle
 import ru.fi.sportapp.ui.theme.SportAppTheme
-import ru.fi.sportapp.viewModels.MainViewModel
+import ru.fi.sportapp.screens.Main.MainViewModel
+import ru.fi.sportapp.screens.PuzzleViewModel
 import kotlin.math.roundToInt
 
 class MainActivity : ComponentActivity() {
@@ -60,6 +65,7 @@ class MainActivity : ComponentActivity() {
         val context = applicationContext
         val appFirebase = AppFirebase()
         val viewModel = MainViewModel(context)
+        val puzzleViewModel = PuzzleViewModel(context)
 
         setContent {
             SportAppTheme {
@@ -117,7 +123,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         if(!viewModel.phone || viewModel.url.isEmpty() && viewModel.isInternetAvailable() && !viewModel.isLoading){
-                            ReallyApp(viewModel = viewModel)
+                            ReallyApp(viewModel = puzzleViewModel)
                         }
 
                         if(viewModel.stateAlertDialog){
@@ -136,37 +142,63 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun ReallyApp(viewModel: MainViewModel){
-    viewModel.listImage.forEach{
-        repeat(3){
-            
-        }
-    }
-
+fun ReallyApp(viewModel: PuzzleViewModel){
+    NavPuzzle(puzzleViewModel = viewModel)
 }
+
 
 @Composable
-private fun DraggableTextLowLevel() {
+private fun DraggableTextWithMultipleSnapZones() {
     Box(modifier = Modifier.fillMaxSize()) {
-        var offsetX by remember { mutableStateOf(0f) }
-        var offsetY by remember { mutableStateOf(0f) }
 
-        Box(
-            Modifier
-                .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
-                .background(Color.Blue)
-                .size(50.dp)
-                .pointerInput(Unit) {
-                    detectDragGestures { change, dragAmount ->
-                        change.consume()
-                        offsetX += dragAmount.x
-                        offsetY += dragAmount.y
+        var offsetX by rememberSaveable { mutableFloatStateOf(0f)}
+        var offsetY by rememberSaveable { mutableFloatStateOf(0f)}
+
+            val snapThreshold = 50.dp // Расстояние, при котором происходит привязка к центру
+
+            val snapZones = listOf(
+                SnapZone(centerX = 50f, centerY = 50f),
+                SnapZone(centerX = 100f, centerY = 100f),
+                SnapZone(centerX = 150f, centerY = 150f)
+            )
+
+            Box(
+                Modifier
+                    .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
+                    .background(Color.Blue)
+                    .size(50.dp)
+                    .pointerInput(Unit) {
+                        detectDragGestures(
+                            onDragEnd = {
+                                val closestZone = snapZones.minByOrNull { zone ->
+                                    val dx = offsetX - zone.centerX
+                                    val dy = offsetY - zone.centerY
+                                    dx * dx + dy * dy
+                                }
+
+                                // Проверяем, находится ли квадрат близко к ближайшей зоне
+                                if (closestZone != null && closestZone.isWithinSnapThreshold(
+                                        Offset(
+                                            offsetX,
+                                            offsetY
+                                        ), snapThreshold
+                                    )
+                                ) {
+                                    // Привязываем квадрат к центру ближайшей зоны
+                                    offsetX = closestZone.centerX - 25.dp.toPx()
+                                    offsetY = closestZone.centerY - 25.dp.toPx()
+                                }
+                            }
+                        ) { change, dragAmount ->
+                            change.consume()
+                            offsetX += dragAmount.x
+                            offsetY += dragAmount.y
+                        }
+
                     }
-                }
-        )
+            )
+        }
     }
-}
-
 @Composable
 fun NeedInternet(onDismiss : () -> Unit){
     AlertDialog(
