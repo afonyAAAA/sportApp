@@ -61,11 +61,19 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
                     offsetYpiece = stateAssemblyPuzzle.offsetYpiece + event.offset.y
                 )
             }
-
             UiEventPuzzleAssembly.MinusSecondTime -> {
                 stateAssemblyPuzzle.copy(
                     totalTime = stateAssemblyPuzzle.totalTime - 1
                 )
+            }
+            UiEventPuzzleAssembly.TimeIsEnd -> {
+                stateAssemblyPuzzle.copy(
+                    isDefeat = true
+                )
+            }
+
+            UiEventPuzzleAssembly.PuzzleIsCompleted -> {
+                stateAssemblyPuzzle
             }
         }
     }

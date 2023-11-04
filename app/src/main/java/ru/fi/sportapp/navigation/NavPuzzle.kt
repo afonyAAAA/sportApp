@@ -1,8 +1,6 @@
 package ru.fi.sportapp.navigation
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -24,7 +22,7 @@ sealed class Screens(val route : String){
 
 
 @Composable
-fun NavPuzzle(puzzleViewModel: PuzzleViewModel, paddingValues: PaddingValues){
+fun NavPuzzle(puzzleViewModel: PuzzleViewModel){
 //    val context = LocalContext.current
 //    val puzzleViewModel : PuzzleViewModel = PuzzleViewModel(context)
     val navHostController = rememberNavController()
@@ -34,7 +32,6 @@ fun NavPuzzle(puzzleViewModel: PuzzleViewModel, paddingValues: PaddingValues){
         startDestination = Screens.Main.route,
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues)
     ){
         composable(Screens.Main.route){
             MainScreen(navHostController = navHostController)

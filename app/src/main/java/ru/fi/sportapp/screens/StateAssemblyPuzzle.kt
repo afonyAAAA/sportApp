@@ -5,7 +5,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ru.fi.sportapp.models.PuzzlePiece
 import ru.fi.sportapp.models.SnapZone
-import java.util.Timer
 
 @Stable
 data class StateAssemblyPuzzle(
@@ -18,5 +17,6 @@ data class StateAssemblyPuzzle(
     val snapZones : MutableList<SnapZone> = mutableListOf(),
     val snapThreshold : Dp = 50.dp,
     val timerIsRunning : Boolean = true,
-    val totalTime : Int = 300
+    val totalTime : Int = 300,
+    val isDefeat : Boolean = false
 )
