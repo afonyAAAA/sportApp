@@ -1,10 +1,13 @@
-package ru.fi.sportapp.screens.Main
+package ru.fi.sportapp.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import ru.fi.sportapp.R
+import ru.fi.sportapp.navigation.Screens
 
 @Composable
 fun MainScreen(navHostController : NavHostController){
@@ -26,21 +30,31 @@ fun MainScreen(navHostController : NavHostController){
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(15.dp),
+        verticalArrangement = Arrangement.spacedBy(15.dp, Alignment.CenterVertically),
     ) {
         Surface(
             shape = RoundedCornerShape(20.dp),
+            modifier = Modifier
+                .height(80.dp)
+                .width(100.dp),
             color = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
         ) {
-            Text(
-                text = stringResource(id = R.string.app_name),
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                Text(
+                    text = stringResource(id = R.string.app_name)
+                )
+            }
         }
 
-        Button(onClick = { }) {
+        Button(onClick = {
+            navHostController.navigate(Screens.Puzzles.route)
+        }) {
             Text(text = "Play")
+        }
+
+        Button(onClick = { navHostController.navigate(Screens.Settings.route) }) {
+            Text(text = "Settings")
         }
     }
 }

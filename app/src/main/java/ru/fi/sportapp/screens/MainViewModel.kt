@@ -1,8 +1,6 @@
-package ru.fi.sportapp.screens.Main
+package ru.fi.sportapp.screens
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.os.Build
 import androidx.compose.runtime.getValue
@@ -10,7 +8,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.google.firebase.BuildConfig
-import ru.fi.sportapp.R
 import java.util.Locale
 
 class MainViewModel(private val context: Context) : ViewModel() {

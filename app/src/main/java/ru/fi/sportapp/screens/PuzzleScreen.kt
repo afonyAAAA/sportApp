@@ -1,11 +1,12 @@
 package ru.fi.sportapp.screens
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,12 +16,19 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.progressSemantics
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -28,14 +36,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import ru.fi.sportapp.models.Position
+import kotlinx.coroutines.delay
+import ru.fi.sportapp.event.UiEventPuzzleAssembly
+import ru.fi.sportapp.models.PuzzlePiece
 import ru.fi.sportapp.models.SnapZone
 import kotlin.math.roundToInt
 
@@ -44,75 +53,88 @@ fun PuzzleScreen(navHostController: NavHostController, viewModel: PuzzleViewMode
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        val snapThreshold = 50.dp
+        val state = viewModel.stateAssemblyPuzzle
+        val lazyState = rememberLazyGridState()
+
+//        LaunchedEffect(state.snapZones){
+//            lazyState.
+//        }
+        LaunchedEffect(state.timerIsRunning){
+            if(state.timerIsRunning){
+                while (state.totalTime > 0){
+                    delay(1000)
+                    viewModel.onEventAssembly(UiEventPuzzleAssembly.MinusSecondTime)
+                }
+            }
+        }
 
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Puzzle", modifier = Modifier.padding(50.dp))
+            Text(text = state.totalTime.toString())
 
-            (0..5).forEach{ columnAndRowIndex ->
+            ProgressIndicator(progress = state.totalTime.toFloat() / 30)
+
+            var counter = 0
+
+            (1..5).forEach{ column ->
                 Column {
                     Row {
-                        (0..5).forEach{positionInRow ->
-                            AreaOfPuzzlePiece(position = Position(Triple(columnAndRowIndex, columnAndRowIndex, positionInRow))){
-                                viewModel.addSnapZone(it)
+                        state.positionsPiecePuzzles.subList(counter, counter + 5).forEach{ positionInRow ->
+                            AreaOfPuzzlePiece(positionInRow){ snapZone ->
+                                if(state.snapZones.size != 25){
+                                    viewModel.onEventAssembly(UiEventPuzzleAssembly.SetSnapZone(snapZone))
+                                }
                             }
                             Spacer(modifier = Modifier.width(5.dp))
                         }
+                        counter += 5
                     }
                 }
                 Spacer(modifier = Modifier.height(5.dp))
             }
-            LazyRow{
-                items(viewModel.listImage){
-                    PuzzlePiece(image = it){ change, offSet ->
-                        viewModel.selectedPiecePuzzle = it
-                        viewModel.offsetX += offSet.x
-                        viewModel.offsetY += offSet.y
-                        viewModel.isDragPiecePuzzle = true
-                    }
-                    Spacer(modifier = Modifier.width(50.dp))
+
+            LazyHorizontalGrid(
+                state = lazyState,
+                rows = GridCells.Fixed(2),
+                contentPadding = PaddingValues(20.dp)
+            ){
+                items(state.piecesPuzzle){ piece ->
+                    PuzzlePiece(puzzlePiece = piece,
+                        onTap = { puzzlePiece, offSet ->
+                            viewModel.onEventAssembly(UiEventPuzzleAssembly.OnTapPiecePuzzle(offSet, puzzlePiece))
+                        }
+                    )
+                    //Spacer(modifier = Modifier.width(10.dp))
                 }
+
             }
         }
 
-        if(viewModel.isDragPiecePuzzle){
+        if(state.isDragPiecePuzzle){
             Image(
-                bitmap = viewModel.selectedPiecePuzzle.asImageBitmap(), "",
+                bitmap = state.selectedPiecePuzzle.piece!!.asImageBitmap(), "",
                 modifier = Modifier
-                    .offset { IntOffset(viewModel.offsetX.roundToInt(), viewModel.offsetY.roundToInt()) }
-                    .background(Color.Blue)
+                    .offset {
+                        IntOffset(
+                            state.offsetXpiece.roundToInt(),
+                            state.offsetYpiece.roundToInt()
+                        )
+                    }
                     .size(50.dp)
                     .pointerInput(Unit) {
                         detectDragGestures(
                             onDragEnd = {
-                                val closestZone = viewModel.snapZones.minByOrNull { zone ->
-                                    val dx = viewModel.offsetX - zone.centerX
-                                    val dy = viewModel.offsetY - zone.centerY
-                                    dx * dx + dy * dy
-                                }
-
-                                // Проверяем, находится ли квадрат близко к ближайшей зоне
-                                if (closestZone != null && closestZone.isWithinSnapThreshold(
-                                        Offset(
-                                            viewModel.offsetX,
-                                            viewModel.offsetX
-                                        ), snapThreshold
-                                    )
-                                ) {
-                                    // Привязываем квадрат к центру ближайшей зоны
-                                    viewModel.offsetX = closestZone.centerX - 25.dp.toPx()
-                                    viewModel.offsetY = closestZone.centerY - 25.dp.toPx()
-                                }
+                                viewModel.onEventAssembly(UiEventPuzzleAssembly.DragEndPiecePuzzle)
                             }
                         ) { change, dragAmount ->
-                            change.consume()
-                            viewModel.offsetX += dragAmount.x
-                            viewModel.offsetY += dragAmount.y
+                            viewModel.onEventAssembly(
+                                UiEventPuzzleAssembly.ContinueDragPiecePuzzle(
+                                    dragAmount
+                                )
+                            )
                         }
-
                     }
             )
         }
@@ -120,54 +142,64 @@ fun PuzzleScreen(navHostController: NavHostController, viewModel: PuzzleViewMode
     }
 }
 
-
 @Composable
-fun PuzzlePiece(image : Bitmap, onDragStart : (PointerInputChange, Offset) -> Unit){
-    var offsetX by remember { mutableFloatStateOf(0f) }
-    var offsetY by remember { mutableFloatStateOf(0f) }
-
-    val density = LocalDensity.current.density
-
-    val boxOnScreen = IntOffset(
-        (offsetX * density).toInt(),
-        (offsetY * density).toInt()
+fun ProgressIndicator(
+    progress: Float,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.primary
+) {
+    LinearProgressIndicator(
+        progress = progress,
+        color = color,
+        modifier = modifier
+            .background(Color.Gray, shape = RoundedCornerShape(4.dp))
+            .fillMaxWidth()
     )
-
-    Image(
-        bitmap = image.asImageBitmap(),
-        contentDescription = "",
-        modifier = Modifier
-            .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
-            .size(50.dp)
-            .pointerInput(Unit) {
-                detectDragGestures { change, dragAmount ->
-                    onDragStart(change, Offset(boxOnScreen.x.toFloat(), boxOnScreen.y.toFloat()))
-                }
-            }
-    )
-
 
 }
 
 @Composable
-fun AreaOfPuzzlePiece(position : Position, setSnapZone: (SnapZone) -> Unit){
+fun PuzzlePiece(
+    puzzlePiece : PuzzlePiece,
+    onTap : (PuzzlePiece, Offset) -> Unit
+){
+    var offset by remember { mutableStateOf(Offset(0f, 0f)) }
 
-    var offsetX by remember { mutableFloatStateOf(0f) }
-    var offsetY by remember { mutableFloatStateOf(0f) }
-
-    Box(
+    Image(
+        bitmap = puzzlePiece.piece!!.asImageBitmap(),
+        contentDescription = "",
         modifier = Modifier
-            .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
-            .background(Color.Gray)
+            .padding(8.dp)
             .size(50.dp)
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    onTap(puzzlePiece, offset)
+                }
+            }
+            .onGloballyPositioned { layoutCoordinates ->
+                val offsetBox = layoutCoordinates.positionInRoot()
+                offset = offsetBox
+            }
     )
+}
 
-    val density = LocalDensity.current.density
-
-    val boxOnScreen = IntOffset(
-        (offsetX * density).toInt(),
-        (offsetY * density).toInt()
-    )
-
-    setSnapZone(SnapZone(boxOnScreen.x.toFloat(),boxOnScreen.y.toFloat()))
+@Composable
+fun AreaOfPuzzlePiece(puzzlePiece: PuzzlePiece, setSnapZone: (SnapZone) -> Unit){
+    if(puzzlePiece.piece == null){
+        Box(
+            modifier = Modifier
+                .background(Color.Gray)
+                .size(50.dp)
+                .onGloballyPositioned {
+                    val offset = it.positionInRoot()
+                    setSnapZone(SnapZone(offset, puzzlePiece.position!!))
+                }
+        )
+    }else{
+        Image(
+            bitmap = puzzlePiece.piece.asImageBitmap(),
+            contentDescription = "",
+            modifier = Modifier.size(50.dp)
+        )
+    }
 }
