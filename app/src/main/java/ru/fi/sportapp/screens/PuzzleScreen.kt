@@ -1,10 +1,14 @@
 package ru.fi.sportapp.screens
 
 import android.graphics.Bitmap
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.stopScroll
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,11 +23,15 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,6 +54,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import kotlinx.coroutines.delay
 import ru.fi.sportapp.event.UiEventPuzzleAssembly
+import ru.fi.sportapp.event.UiEventPuzzleChoose
 import ru.fi.sportapp.models.PuzzlePiece
 import ru.fi.sportapp.models.SnapZone
 import ru.fi.sportapp.navigation.Screens
@@ -53,111 +62,139 @@ import kotlin.math.roundToInt
 
 @Composable
 fun PuzzleScreen(navHostController: NavHostController, viewModel: PuzzleViewModel){
-
     val state = viewModel.stateAssemblyPuzzle
-    val lazyState = rememberLazyGridState()
 
-    LaunchedEffect(state.timerIsRunning){
-        if(state.timerIsRunning){
-            while (state.totalTime > 0){
-                delay(1000)
-                viewModel.onEventAssembly(UiEventPuzzleAssembly.MinusSecondTime)
-            }
-            viewModel.onEventAssembly(UiEventPuzzleAssembly.TimeIsEnd)
-        }
-    }
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        ProgressIndicator(progress = (state.totalTime.toFloat() / 300f) * 1.0f)
-
-        var counter = 0
-
-        (1..5).forEach{ column ->
-            Column {
-                Row {
-                    state.positionsPiecePuzzles.subList(counter, counter + 5).forEach{ positionInRow ->
-                        AreaOfPuzzlePiece(positionInRow){ snapZone ->
-                            if(state.snapZones.size != 25){
-                                viewModel.onEventAssembly(UiEventPuzzleAssembly.SetSnapZone(snapZone))
-                            }
-                        }
-                        //Spacer(modifier = Modifier.width(5.dp))
-                    }
-                    counter += 5
+    Box(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .background(MaterialTheme.colorScheme.background)
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    viewModel.onEventAssembly(UiEventPuzzleAssembly.OnTapWithPiecePuzzle(it))
                 }
             }
-            //Spacer(modifier = Modifier.height(5.dp))
-        }
-
-        LazyHorizontalGrid(
-            state = lazyState,
-            rows = GridCells.Fixed(2),
-            contentPadding = PaddingValues(20.dp)
-        ){
-            items(state.piecesPuzzle){ piece ->
-                PuzzlePiece(puzzlePiece = piece,
-                    onTap = { puzzlePiece, offSet ->
-                        viewModel.onEventAssembly(UiEventPuzzleAssembly.OnTapPiecePuzzle(offSet, puzzlePiece))
-                    }
-                )
+    ){
+        LaunchedEffect(state.timerIsRunning){
+            if(state.timerIsRunning){
+                while (state.totalTime > 0){
+                    delay(1000)
+                    viewModel.onEventAssembly(UiEventPuzzleAssembly.MinusSecondTime)
+                }
+                viewModel.onEventAssembly(UiEventPuzzleAssembly.TimeIsEnd)
             }
         }
-    }
 
-    if (state.isDefeat){
-        AlertDialogDefeat {
-            navHostController.navigate(
-                Screens.Puzzles.route,
-                NavOptions.Builder()
-                    .setPopUpTo(Screens.Main.route, true)
-                    .build()
-            )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            if(state.timerIsRunning){
+                ProgressIndicator(progress = (state.totalTime.toFloat() / 300f) * 1.0f)
+            }
+
+            var counter = 0
+
+            (1..5).forEach{ column ->
+                Column {
+                    Row {
+                        state.positionsPiecePuzzles.subList(counter, counter + 5).forEach{ positionInRow ->
+                            AreaOfPuzzlePiece(positionInRow){ snapZone ->
+                                if(state.snapZones.size != 25){
+                                    viewModel.onEventAssembly(UiEventPuzzleAssembly.SetSnapZone(snapZone))
+                                }
+                            }
+                        }
+                        counter += 5
+                    }
+                }
+            }
+
+            LazyHorizontalGrid(
+                rows = GridCells.Fixed(2),
+                contentPadding = PaddingValues(20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(350.dp),
+                verticalArrangement = Arrangement.Center
+            ){
+                items(
+                    state.piecesPuzzle,
+                    key = { listItem ->
+                        listItem.id
+                    }
+                ){ piece ->
+                    PuzzlePiece(puzzlePiece = piece,
+                        onTap = { puzzlePiece, offSet ->
+                            viewModel.onEventAssembly(UiEventPuzzleAssembly.OnTapPiecePuzzle(offSet, puzzlePiece))
+                        }
+                    )
+                }
+            }
         }
-    }
 
-    if(state.snapZones.isEmpty()){
-        AlertDialogVictory(
-            onDismiss = {
+        if (state.isDefeat){
+            AlertDialogDefeat {
                 navHostController.navigate(
                     Screens.Puzzles.route,
                     NavOptions.Builder()
                         .setPopUpTo(Screens.Main.route, true)
                         .build()
                 )
-            },
-            completedPuzzle = viewModel.stateChoosePuzzle.selectedPuzzle!!.image
-        )
-        viewModel.onEventAssembly(UiEventPuzzleAssembly.PuzzleIsCompleted)
-    }
+                viewModel.onEventAssembly(UiEventPuzzleAssembly.ResetAssemblyPuzzle)
+            }
+        }
 
-    if(state.isDragPiecePuzzle){
-        Image(
-            bitmap = state.selectedPiecePuzzle.piece!!.asImageBitmap(), "",
-            modifier = Modifier
-                .offset {
-                    IntOffset(
-                        state.offsetXpiece.roundToInt(),
-                        state.offsetYpiece.roundToInt()
+        if(state.isVictory){
+            AlertDialogVictory(
+                onDismiss = {
+                    navHostController.navigate(
+                        Screens.Puzzles.route,
+                        NavOptions.Builder()
+                            .setPopUpTo(Screens.Main.route, true)
+                            .build()
                     )
-                }
-                .size(50.dp)
-                .pointerInput(Unit) {
-                    detectDragGestures(
-                        onDragEnd = {
-                            viewModel.onEventAssembly(UiEventPuzzleAssembly.DragEndPiecePuzzle)
-                        }
-                    ) { change, dragAmount ->
-                        viewModel.onEventAssembly(
-                            UiEventPuzzleAssembly.ContinueDragPiecePuzzle(
-                                dragAmount
-                            )
+                    viewModel.onEventAssembly(UiEventPuzzleAssembly.ResetAssemblyPuzzle)
+                    viewModel.onEventChoosePuzzle(UiEventPuzzleChoose.ShowImages)
+                },
+                completedPuzzle = viewModel.stateChoosePuzzle.selectedPuzzle!!.image
+            )
+            viewModel.onEventAssembly(UiEventPuzzleAssembly.PuzzleIsCompleted)
+        }
+
+        if(state.isDragPiecePuzzle){
+            Image(
+                bitmap = state.selectedPiecePuzzle.piece!!.asImageBitmap(), "",
+                modifier = Modifier
+                    .offset {
+                        IntOffset(
+                            state.offsetXpiece.roundToInt(),
+                            state.offsetYpiece.roundToInt()
                         )
                     }
-                }
-        )
+                    .pointerInput(Unit) {
+                        detectDragGestures(
+                            onDragEnd = {
+                                viewModel.onEventAssembly(UiEventPuzzleAssembly.DragEndPiecePuzzle)
+                            }
+                        ) { change, dragAmount ->
+                            viewModel.onEventAssembly(
+                                UiEventPuzzleAssembly.ContinueDragPiecePuzzle(
+                                    dragAmount
+                                )
+                            )
+                        }
+                    }
+                    .size(50.dp)
+            )
+        }
+
+        BackHandler {
+            navHostController.popBackStack()
+            viewModel.onEventAssembly(UiEventPuzzleAssembly.ResetAssemblyPuzzle)
+        }
     }
 }
 
@@ -165,6 +202,7 @@ fun PuzzleScreen(navHostController: NavHostController, viewModel: PuzzleViewMode
 fun AlertDialogDefeat(onDismiss : () -> Unit){
     AlertDialog(
         onDismissRequest = { onDismiss() },
+        containerColor = MaterialTheme.colorScheme.background,
         confirmButton = { 
             Button(onClick = {
                 onDismiss()
@@ -173,7 +211,7 @@ fun AlertDialogDefeat(onDismiss : () -> Unit){
             }
         },
         title = {
-            Text(text = "You didn't have time :(")
+            Text(text = "You didn't have time :(", color = MaterialTheme.colorScheme.onPrimary)
         }
     )
 }
@@ -182,6 +220,7 @@ fun AlertDialogDefeat(onDismiss : () -> Unit){
 fun AlertDialogVictory(onDismiss : () -> Unit, completedPuzzle : Bitmap){
     AlertDialog(
         onDismissRequest = { onDismiss() },
+        containerColor = MaterialTheme.colorScheme.background,
         confirmButton = {
             Button(onClick = {
                 onDismiss()
@@ -190,14 +229,14 @@ fun AlertDialogVictory(onDismiss : () -> Unit, completedPuzzle : Bitmap){
             }
         },
         title = {
-            Text(text = "You've completed the puzzle!")
+            Text(text = "You've completed the puzzle!", color = MaterialTheme.colorScheme.onPrimary)
         },
         text = {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
                 Image(
                     bitmap = completedPuzzle.asImageBitmap(),
                     contentDescription = "",
-                    modifier = Modifier.size(50.dp)
+                    modifier = Modifier.size(200.dp)
                 )
             }
         }
@@ -230,22 +269,29 @@ fun PuzzlePiece(
 ){
     var offset by remember { mutableStateOf(Offset(0f, 0f)) }
 
-    Image(
-        bitmap = puzzlePiece.piece!!.asImageBitmap(),
-        contentDescription = "",
-        modifier = Modifier
-            .padding(8.dp)
-            .size(50.dp)
-            .pointerInput(Unit) {
-                detectTapGestures {
-                    onTap(puzzlePiece, offset)
-                }
-            }
-            .onGloballyPositioned { layoutCoordinates ->
-                val offsetBox = layoutCoordinates.positionInRoot()
-                offset = offsetBox
-            }
-    )
+    Box(modifier = Modifier.size(75.dp), contentAlignment = Alignment.Center) {
+        Surface(
+            modifier = Modifier.size(75.dp),
+            color = MaterialTheme.colorScheme.primary
+        ) {
+            Image(
+                bitmap = puzzlePiece.piece!!.asImageBitmap(),
+                contentDescription = "",
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(50.dp)
+                    .pointerInput(Unit) {
+                        detectTapGestures {
+                            onTap(puzzlePiece, offset)
+                        }
+                    }
+                    .onGloballyPositioned { layoutCoordinates ->
+                        val offsetBox = layoutCoordinates.positionInRoot()
+                        offset = offsetBox
+                    }
+            )
+        }
+    }
 }
 
 @Composable

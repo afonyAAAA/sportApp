@@ -20,19 +20,19 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
     var stateAssemblyPuzzle by mutableStateOf(StateAssemblyPuzzle())
     var stateChoosePuzzle by mutableStateOf(StateChoosePuzzle())
     var stateSettingsPuzzle by mutableStateOf(StateSettingsPuzzle())
+
     init {
         readSettingsPuzzle()
         stateChoosePuzzle = stateChoosePuzzle.copy(listImage = getAllPuzzles())
     }
 
     fun onEventAssembly(event: UiEventPuzzleAssembly){
-        stateAssemblyPuzzle = when(event){
+         when(event){
             UiEventPuzzleAssembly.DragEndPiecePuzzle -> {
                 draggedEndPieceOnSnapZone()
-                stateAssemblyPuzzle
             }
             is UiEventPuzzleAssembly.OnTapPiecePuzzle -> {
-                stateAssemblyPuzzle.copy(
+                stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
                     selectedPiecePuzzle = event.puzzlePiece,
                     offsetXpiece = event.offset.x,
                     offsetYpiece = event.offset.y,
@@ -41,7 +41,7 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
             }
             is UiEventPuzzleAssembly.SetSnapZone -> {
                 val newSnapZones = stateAssemblyPuzzle.snapZones + event.snapZone
-                stateAssemblyPuzzle.copy(
+                stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
                     snapZones = newSnapZones.toMutableList()
                 )
             }
@@ -49,31 +49,49 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
 
                 val piecesPuzzle = splitImage()
 
-                stateAssemblyPuzzle.copy(
-                    piecesPuzzle = piecesPuzzle,
+                stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
+                    piecesPuzzle = piecesPuzzle.shuffled().toMutableList(),
                     positionsPiecePuzzles =
-                        piecesPuzzle.map { PuzzlePiece(piece = null, position = it.position) }.toMutableList()
+                        piecesPuzzle.map { PuzzlePiece(piece = null, position = it.position,) }.toMutableList(),
+                    timerIsRunning = stateSettingsPuzzle.timerIsOn
                 )
             }
             is UiEventPuzzleAssembly.ContinueDragPiecePuzzle -> {
-                stateAssemblyPuzzle.copy(
+                stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
                     offsetXpiece = stateAssemblyPuzzle.offsetXpiece + event.offset.x,
                     offsetYpiece = stateAssemblyPuzzle.offsetYpiece + event.offset.y
                 )
             }
             UiEventPuzzleAssembly.MinusSecondTime -> {
-                stateAssemblyPuzzle.copy(
+                stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
                     totalTime = stateAssemblyPuzzle.totalTime - 1
                 )
             }
             UiEventPuzzleAssembly.TimeIsEnd -> {
-                stateAssemblyPuzzle.copy(
+                stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
                     isDefeat = true
                 )
             }
-
             UiEventPuzzleAssembly.PuzzleIsCompleted -> {
-                stateAssemblyPuzzle
+                addCompletedPuzzle()
+            }
+            is UiEventPuzzleAssembly.OnTapWithPiecePuzzle -> {
+                stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
+                    offsetXpiece = event.offset.x - 50.0f,
+                    offsetYpiece = event.offset.y - 50.0f
+                )
+                draggedEndPieceOnSnapZone()
+            }
+            UiEventPuzzleAssembly.ResetAssemblyPuzzle -> {
+                stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
+                    selectedPiecePuzzle = PuzzlePiece(),
+                    isDragPiecePuzzle = false,
+                    offsetXpiece = 0f,
+                    offsetYpiece = 0f,
+                    totalTime = 300,
+                    isVictory = false,
+                    isDefeat = false
+                )
             }
         }
     }
@@ -95,27 +113,24 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
 
 
     fun onEventSettingsPuzzle(event: UiEventSettingsPuzzle){
-        stateSettingsPuzzle = when(event){
+         when(event){
             UiEventSettingsPuzzle.ResetCompletedPuzzle -> {
                 resetCompletedPuzzle()
                 stateChoosePuzzle = stateChoosePuzzle.copy(
                     listImage = getAllPuzzles()
                 )
-                stateSettingsPuzzle
             }
             is UiEventSettingsPuzzle.TimerStateImageChoose -> {
-                stateSettingsPuzzle.copy(
-                    timerIsOn = event.state.apply {
-                        editTimerState()
-                    }
+                stateSettingsPuzzle = stateSettingsPuzzle.copy(
+                    timerIsOn = event.state
                 )
+                editTimerState()
             }
             is UiEventSettingsPuzzle.VisibleStateImageChoose -> {
-                stateSettingsPuzzle.copy(
-                    imageIsVisible = event.state.apply {
-                        editVisibleImages()
-                    }
+                stateSettingsPuzzle =stateSettingsPuzzle.copy(
+                    imageIsVisible = event.state
                 )
+                editVisibleImages()
             }
         }
     }
@@ -129,6 +144,7 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
             imageIsVisible = visibleImageState,
             timerIsOn = timerState
         )
+
     }
 
     private fun editVisibleImages(){
@@ -147,10 +163,7 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
 
     private fun resetCompletedPuzzle(){
         val sp = context.getSharedPreferences("listCompletedPuzzle", Context.MODE_PRIVATE)
-        val editor = sp.edit()
-        stateChoosePuzzle.listImage.forEach { image ->
-            editor.putString(image.pathName, "")
-        }
+        val editor = sp.edit().clear()
         editor.apply()
     }
 
@@ -161,17 +174,15 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
 
         listPathImages!!.forEach { path ->
             if(path.substring(0..4) == "image"){
-                val isVisibleImage = sp.getString(path, "")?.isNotEmpty() ?: false
+                val isVisibleImage = sp.getBoolean(path, false)
                 val inputStream = context.assets.open("images/$path")
                 val image = BitmapFactory.decodeStream(inputStream)
                 images.add(Image(path, image, isVisibleImage))
             }
         }
 
-        return images
+        return images.shuffled().toMutableList()
     }
-
-
 
     private fun linkingToSnapZone(offset: Offset){
         stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
@@ -183,7 +194,7 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
     private fun addCompletedPuzzle(){
         val sp = context.getSharedPreferences("listCompletedPuzzle", Context.MODE_PRIVATE)
         val editor = sp.edit()
-        editor.putString(stateChoosePuzzle.selectedPuzzle!!.pathName, "")
+        editor.putBoolean(stateChoosePuzzle.selectedPuzzle!!.pathName, true)
         editor.apply()
     }
     private fun isCorrectSetPiecePuzzle(position: Position)  =  stateAssemblyPuzzle.selectedPiecePuzzle.position == position
@@ -194,7 +205,7 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
         for (pos in newPositionsPuzzlePiece){
             if(pos.position == position){
                 val index = newPositionsPuzzlePiece.indexOf(pos)
-                newPositionsPuzzlePiece[index] = PuzzlePiece(piece, pos.position)
+                newPositionsPuzzlePiece[index] = PuzzlePiece(piece, pos.position,)
             }
         }
 
@@ -226,7 +237,7 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
                     closestZone.position,
                     stateAssemblyPuzzle.selectedPiecePuzzle.piece!!
                 )
-                deletePiecePuzzle(stateAssemblyPuzzle.selectedPiecePuzzle.position!!)
+                deletePiecePuzzle(stateAssemblyPuzzle.selectedPiecePuzzle)
                 deleteSnapZone(closestZone)
 
                 stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
@@ -245,30 +256,37 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
         val tileHeight = imageHeight / 5
 
         val tiles = mutableListOf<PuzzlePiece>()
+        var counter = 1
 
         for (row in 0 until 5) {
             for (col in 0 until 5) {
                 val x = col * tileWidth
                 val y = row * tileHeight
                 val tile = Bitmap.createBitmap(fullImageOfPuzzle, x, y, tileWidth, tileHeight)
-                val puzzlePiece = PuzzlePiece(tile, Position(Triple(row + 1, row + 1, col + 1)))
+                val puzzlePiece = PuzzlePiece(tile, Position(Triple(row + 1, row + 1, col + 1)), id = counter)
                 tiles.add(puzzlePiece)
+                counter++
             }
+            counter++
         }
 
         return tiles
     }
 
-    private fun deletePiecePuzzle(position: Position) {
-        val newListPiecesPuzzle = stateAssemblyPuzzle.piecesPuzzle.filter { it.position != position }.toMutableList()
-
-        stateAssemblyPuzzle = stateAssemblyPuzzle.copy(piecesPuzzle = newListPiecesPuzzle)
+    private fun deletePiecePuzzle(piece: PuzzlePiece) {
+        stateAssemblyPuzzle = stateAssemblyPuzzle.copy(piecesPuzzle = stateAssemblyPuzzle.piecesPuzzle.minus(piece).toMutableList())
     }
 
     private fun deleteSnapZone(snap: SnapZone) {
         stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
             snapZones = stateAssemblyPuzzle.snapZones.filter { it.offset != snap.offset }.toMutableList()
         )
+
+        if(stateAssemblyPuzzle.snapZones.isEmpty()){
+            stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
+                isVictory = true
+            )
+        }
     }
 
 }

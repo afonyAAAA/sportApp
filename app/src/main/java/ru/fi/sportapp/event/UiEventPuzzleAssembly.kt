@@ -13,4 +13,6 @@ sealed class UiEventPuzzleAssembly{
     object MinusSecondTime : UiEventPuzzleAssembly()
     object TimeIsEnd : UiEventPuzzleAssembly()
     object PuzzleIsCompleted : UiEventPuzzleAssembly()
+    data class OnTapWithPiecePuzzle(val offset: Offset) : UiEventPuzzleAssembly()
+    object ResetAssemblyPuzzle : UiEventPuzzleAssembly()
 }

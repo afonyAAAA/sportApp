@@ -1,5 +1,6 @@
 package ru.fi.sportapp.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +29,7 @@ fun SettingsScreen(navHostController: NavHostController, puzzleViewModel: Puzzle
 
     Column(
         modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -49,7 +51,11 @@ fun SettingsScreen(navHostController: NavHostController, puzzleViewModel: Puzzle
             })
         }
 
-        Button(onClick = {  }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+        Button(
+            onClick = {
+                puzzleViewModel.onEventSettingsPuzzle(UiEventSettingsPuzzle.ResetCompletedPuzzle)
+            },
+            modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text(text = "Reset completed puzzles")
         }
         
