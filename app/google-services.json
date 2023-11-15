@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "779443179120",
-    "project_id": "sportapp-3319e",
-    "storage_bucket": "sportapp-3319e.appspot.com"
+    "project_number": "286142753941",
+    "project_id": "gigbtbtgi",
+    "storage_bucket": "gigbtbtgi.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:779443179120:android:31ad9e4ea865d83304eeb5",
+        "mobilesdk_app_id": "1:286142753941:android:5c585d0299b2e82e527f9c",
         "android_client_info": {
-          "package_name": "ru.fi.sportapp"
+          "package_name": "com.boundless.GIGABET.wonders"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC2JHRHxNST10Jdv02XRfnc_vPOvbqovJw"
+          "current_key": "AIzaSyBm69TIc_U9vGtC8QeSWNiPr1yent1yRcQ"
         }
       ],
       "services": {

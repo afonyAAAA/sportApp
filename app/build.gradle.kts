@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "ru.fi.sportapp"
+    namespace = "com.boundless.GIGABET.wonders"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "ru.fi.sportapp"
+        applicationId = "com.boundless.GIGABET.wonders"
         minSdk = 21
         targetSdk = 34
         versionCode = 1
@@ -78,7 +78,6 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("androidx.navigation:navigation-compose:2.7.5")
-
 }
 
 
