@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -61,6 +62,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun PuzzleScreen(navHostController: NavHostController, viewModel: PuzzleViewModel){
+
     val state = viewModel.stateAssemblyPuzzle
 
     Image(
@@ -74,11 +76,6 @@ fun PuzzleScreen(navHostController: NavHostController, viewModel: PuzzleViewMode
         modifier = Modifier
             .verticalScroll(rememberScrollState())
             .fillMaxSize()
-            .pointerInput(Unit) {
-                detectTapGestures {
-                    viewModel.onEventAssembly(UiEventPuzzleAssembly.OnTapWithPiecePuzzle(it))
-                }
-            }
     ){
         LaunchedEffect(state.timerIsRunning){
             if(state.timerIsRunning){
@@ -169,27 +166,40 @@ fun PuzzleScreen(navHostController: NavHostController, viewModel: PuzzleViewMode
             viewModel.onEventAssembly(UiEventPuzzleAssembly.PuzzleIsCompleted)
         }
 
-        if(state.isDragPiecePuzzle){
+//        LaunchedEffect(state.selectedPiecesPuzzle){
+//            state
+//        }
+
+
+
+        state.selectedPiecesPuzzle.forEachIndexed { index, puzzle ->
             Image(
-                bitmap = state.selectedPiecePuzzle.piece!!.asImageBitmap(), "",
+                bitmap = puzzle.piece!!.asImageBitmap(), "",
                 modifier = Modifier
                     .offset {
                         IntOffset(
-                            state.offsetXpiece.roundToInt(),
-                            state.offsetYpiece.roundToInt()
+                            puzzle.offSetX.roundToInt(),
+                            puzzle.offsetY.roundToInt()
                         )
                     }
                     .pointerInput(Unit) {
                         detectDragGestures(
                             onDragEnd = {
-                                viewModel.onEventAssembly(UiEventPuzzleAssembly.DragEndPiecePuzzle)
+                                viewModel.onEventAssembly(
+                                    UiEventPuzzleAssembly.DragEndPiecePuzzle(
+                                        index
+                                    )
+                                )
                             }
                         ) { change, dragAmount ->
                             viewModel.onEventAssembly(
                                 UiEventPuzzleAssembly.ContinueDragPiecePuzzle(
-                                    dragAmount
+                                    dragAmount,
+                                    puzzle,
+                                    index
                                 )
                             )
+                            change.consumeAllChanges()
                         }
                     }
                     .size(50.dp)
@@ -319,3 +329,5 @@ fun AreaOfPuzzlePiece(puzzlePiece: PuzzlePiece, setSnapZone: (SnapZone) -> Unit)
         )
     }
 }
+
+

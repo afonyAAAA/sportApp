@@ -76,19 +76,21 @@ class MainActivity : ComponentActivity() {
                             restartApp(context)
                         }
                     }else{
-                        LaunchedEffect(viewModel.url){
-                            val result = appFirebase.getUrl()
-                            viewModel.isLoading = false
 
-                            if(result.second || !viewModel.isInternetAvailable()){
-                                viewModel.stateAlertDialog = true
-                            }
-
-                            if(result.first.isNotEmpty() && !result.second && viewModel.phone){
-                                viewModel.url = result.first
-                                viewModel.saveUrl()
-                            }
-                        }
+                        viewModel.isLoading = false
+//                        LaunchedEffect(viewModel.url){
+//                            val result = appFirebase.getUrl()
+//                            viewModel.isLoading = false
+//
+//                            if(result.second || !viewModel.isInternetAvailable()){
+//                                viewModel.stateAlertDialog = true
+//                            }
+//
+//                            if(result.first.isNotEmpty() && !result.second && viewModel.phone){
+//                                viewModel.url = result.first
+//                                viewModel.saveUrl()
+//                            }
+//                        }
 
                         if(viewModel.isLoading){
                             Column(

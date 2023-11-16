@@ -8,10 +8,7 @@ import com.boundless.GIGABET.wonders.models.SnapZone
 
 @Stable
 data class StateAssemblyPuzzle(
-    val offsetXpiece: Float = 0f,
-    val offsetYpiece: Float = 0f,
-    val isDragPiecePuzzle: Boolean = false,
-    val selectedPiecePuzzle: PuzzlePiece = PuzzlePiece(),
+    val selectedPiecesPuzzle : MutableList<PuzzlePiece> = mutableListOf(),
     val positionsPiecePuzzles: MutableList<PuzzlePiece> = mutableListOf(),
     val piecesPuzzle : MutableList<PuzzlePiece> = mutableListOf(),
     val snapZones: MutableList<SnapZone> = mutableListOf(),

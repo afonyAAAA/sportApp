@@ -7,12 +7,11 @@ import com.boundless.GIGABET.wonders.models.SnapZone
 sealed class UiEventPuzzleAssembly{
     object PuzzleIsChoose : UiEventPuzzleAssembly()
     data class OnTapPiecePuzzle(val offset: Offset, val puzzlePiece: PuzzlePiece) : UiEventPuzzleAssembly()
-    data class ContinueDragPiecePuzzle(val offset: Offset) : UiEventPuzzleAssembly()
-    object DragEndPiecePuzzle : UiEventPuzzleAssembly()
+    data class ContinueDragPiecePuzzle(val offset: Offset, val puzzlePiece: PuzzlePiece, val index : Int) : UiEventPuzzleAssembly()
+    data class DragEndPiecePuzzle(val index: Int) : UiEventPuzzleAssembly()
     data class SetSnapZone(val snapZone : SnapZone) : UiEventPuzzleAssembly()
     object MinusSecondTime : UiEventPuzzleAssembly()
     object TimeIsEnd : UiEventPuzzleAssembly()
     object PuzzleIsCompleted : UiEventPuzzleAssembly()
-    data class OnTapWithPiecePuzzle(val offset: Offset) : UiEventPuzzleAssembly()
     object ResetAssemblyPuzzle : UiEventPuzzleAssembly()
 }
