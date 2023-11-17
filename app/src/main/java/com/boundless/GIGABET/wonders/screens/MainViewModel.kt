@@ -16,7 +16,7 @@ class MainViewModel(private val context: Context) : ViewModel() {
     var url by mutableStateOf("")
     var isLoading by mutableStateOf(true)
     val localUrl = checkLocalUrl()
-    val phone = checkIsEmu()
+    //val phone = checkIsEmu()
     var showReallyApp = false
 
     private fun checkIsEmu(): Boolean {

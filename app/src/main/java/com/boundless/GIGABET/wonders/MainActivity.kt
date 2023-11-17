@@ -65,12 +65,7 @@ class MainActivity : ComponentActivity() {
                     contentAlignment = Alignment.BottomEnd
                 ){
                     if(viewModel.localUrl.isNotEmpty()){
-                        if(viewModel.isInternetAvailable())
-                            WebView(url = viewModel.localUrl)
-                        else
-                            NeedInternet {
-                                restartApp(context)
-                            }
+                        WebView(url = viewModel.localUrl)
                     } else{
                         LaunchedEffect(viewModel.url){
                             try {
@@ -81,7 +76,7 @@ class MainActivity : ComponentActivity() {
                                     throw Exception()
                                 }
 
-                                if(result.first.isNotEmpty() && viewModel.phone){
+                                if(result.first.isNotEmpty()){
                                     viewModel.url = result.first
                                     viewModel.saveUrl()
                                 }
