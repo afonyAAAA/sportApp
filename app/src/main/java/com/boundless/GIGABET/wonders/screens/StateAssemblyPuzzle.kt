@@ -1,6 +1,7 @@
 package com.boundless.GIGABET.wonders.screens
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.boundless.GIGABET.wonders.models.PuzzlePiece
@@ -16,5 +17,6 @@ data class StateAssemblyPuzzle(
     val timerIsRunning: Boolean = true,
     val totalTime: Int = 300,
     val isDefeat: Boolean = false,
-    val isVictory: Boolean = false
+    val isVictory: Boolean = false,
+    val lastOffset : Offset = Offset(0f, 0f)
 )

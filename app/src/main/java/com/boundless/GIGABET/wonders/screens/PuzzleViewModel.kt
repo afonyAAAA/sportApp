@@ -57,14 +57,15 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
                 stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
                     piecesPuzzle = piecesPuzzle.shuffled().toMutableList(),
                     positionsPiecePuzzles =
-                        piecesPuzzle.map { PuzzlePiece(piece = null, position = it.position,) }.toMutableList(),
+                        piecesPuzzle.map { PuzzlePiece(piece = null, position = it.position) }.toMutableList(),
                     timerIsRunning = stateSettingsPuzzle.timerIsOn
                 )
             }
             is UiEventPuzzleAssembly.ContinueDragPiecePuzzle -> {
                 val updatedPuzzles = stateAssemblyPuzzle.selectedPiecesPuzzle.toMutableList()
                 val selectedPuzzle = updatedPuzzles[event.index]
-                updatedPuzzles[event.index] = event.puzzlePiece.copy(offsetY = selectedPuzzle.offsetY + event.offset.y, offSetX = selectedPuzzle.offSetX + event.offset.x)
+
+                updatedPuzzles[event.index] = selectedPuzzle.copy(offsetY = selectedPuzzle.offsetY + event.offset.y, offSetX = selectedPuzzle.offSetX + event.offset.x)
                 stateAssemblyPuzzle = stateAssemblyPuzzle.copy(selectedPiecesPuzzle = updatedPuzzles)
             }
             UiEventPuzzleAssembly.MinusSecondTime -> {
@@ -88,7 +89,15 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
                     isDefeat = false
                 )
             }
-        }
+
+             is UiEventPuzzleAssembly.OnDragStart -> {
+                 val updatedPuzzles = stateAssemblyPuzzle.selectedPiecesPuzzle.toMutableList()
+                 val selectedPuzzle = updatedPuzzles[event.index]
+                 stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
+                     lastOffset = Offset(selectedPuzzle.offSetX, selectedPuzzle.offsetY)
+                 )
+             }
+         }
     }
 
     fun onEventChoosePuzzle(event: UiEventPuzzleChoose){
@@ -221,8 +230,8 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
     }
 
     private fun draggedEndPieceOnSnapZone(index : Int){
-
-        val puzzlePiece = stateAssemblyPuzzle.selectedPiecesPuzzle[index]
+        val updatedPuzzles = stateAssemblyPuzzle.selectedPiecesPuzzle.toMutableList()
+        val puzzlePiece = updatedPuzzles[index]
 
         val closestZone = stateAssemblyPuzzle.snapZones.minByOrNull { zone ->
             val dx = puzzlePiece.offSetX - zone.offset.x
@@ -237,19 +246,82 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
                 ), stateAssemblyPuzzle.snapThreshold
             )
         ) {
-            // Привязываем квадрат к центру ближайшей зоны
-            linkingToSnapZone(closestZone.offset, index)
-
-            if (isCorrectSetPiecePuzzle(closestZone.position, puzzlePiece)) {
-                setPiecePuzzle(
-                    closestZone.position,
-                    puzzlePiece.piece!!
-                )
-                deleteSnapZone(closestZone)
-                deleteSelectedPiecePuzzle(index)
-
+            var isReplace = false
+            var oldPuzzle = PuzzlePiece()
+            stateAssemblyPuzzle.selectedPiecesPuzzle.forEach {
+                if (it.offSetX == closestZone.offset.x && it.offsetY == closestZone.offset.y) {
+                    replacePuzzles(selectedPuzzle = puzzlePiece, oldPuzzle = it)
+                    oldPuzzle = it
+                    isReplace = true
+                }
             }
+                // Привязываем квадрат к центру ближайшей зоны
+                linkingToSnapZone(closestZone.offset, index)
+
+                if (isCorrectSetPiecePuzzle(closestZone.position, puzzlePiece)) {
+                    setPiecePuzzle(
+                        closestZone.position,
+                        puzzlePiece.piece!!
+                    )
+                    deleteSnapZone(closestZone)
+                    deleteSelectedPiecePuzzle(index)
+                }
+
+                if(isReplace){
+                    val updatedPuzzless = stateAssemblyPuzzle.selectedPiecesPuzzle.toMutableList()
+                    val indexO = updatedPuzzless.indexOf(oldPuzzle.copy(
+                        offSetX = stateAssemblyPuzzle.lastOffset.x,
+                        offsetY = stateAssemblyPuzzle.lastOffset.y
+                    ))
+                    val closestZoneO = stateAssemblyPuzzle.snapZones.minByOrNull { zone ->
+                        val dx = stateAssemblyPuzzle.lastOffset.x - zone.offset.x
+                        val dy = stateAssemblyPuzzle.lastOffset.y - zone.offset.y
+                        dx * dx + dy * dy
+                    }
+                    if (closestZoneO != null && closestZoneO.isWithinSnapThreshold(
+                            Offset(
+                                stateAssemblyPuzzle.lastOffset.x,
+                                stateAssemblyPuzzle.lastOffset.y
+                            ), stateAssemblyPuzzle.snapThreshold
+                        )
+                    ) {
+                        if (isCorrectSetPiecePuzzle(closestZoneO.position, oldPuzzle)) {
+                            setPiecePuzzle(
+                                closestZoneO.position,
+                                oldPuzzle.piece!!
+                            )
+                            deleteSnapZone(closestZoneO)
+                            deleteSelectedPiecePuzzle(indexO)
+                        }
+                    }
+                }
+
         }
+    }
+
+    private fun replacePuzzles(selectedPuzzle : PuzzlePiece, oldPuzzle : PuzzlePiece){
+        //val offsetForOldPuzzle = Offset(selectedPuzzle.offSetX, selectedPuzzle.offsetY)
+        val offsetForSelectedPuzzle = Offset(oldPuzzle.offSetX, oldPuzzle.offsetY)
+
+        val updatedPuzzles = stateAssemblyPuzzle.selectedPiecesPuzzle.toMutableList()
+        val indexSelected = updatedPuzzles.indexOf(selectedPuzzle)
+        val indexOld = updatedPuzzles.indexOf(oldPuzzle)
+
+        updatedPuzzles[indexSelected] = selectedPuzzle.copy(
+            offSetX = offsetForSelectedPuzzle.x,
+            offsetY = offsetForSelectedPuzzle.y
+        )
+
+        updatedPuzzles[indexOld] = oldPuzzle.copy(
+            offSetX = stateAssemblyPuzzle.lastOffset.x,
+            offsetY = stateAssemblyPuzzle.lastOffset.y
+        )
+
+        stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
+            selectedPiecesPuzzle = updatedPuzzles
+        )
+
+
     }
 
     private fun splitImage() : MutableList<PuzzlePiece>{
@@ -282,8 +354,8 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
     }
 
     private fun deleteSelectedPiecePuzzle(index : Int){
-        val selectedPuzzle = stateAssemblyPuzzle.selectedPiecesPuzzle[index]
-        val updatedPuzzles = stateAssemblyPuzzle.selectedPiecesPuzzle.filter { selectedPuzzle.id != it.id }.toMutableList()
+        val updatedPuzzles = stateAssemblyPuzzle.selectedPiecesPuzzle.toMutableList()
+        updatedPuzzles.removeAt(index)
         stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
             selectedPiecesPuzzle = updatedPuzzles
         )

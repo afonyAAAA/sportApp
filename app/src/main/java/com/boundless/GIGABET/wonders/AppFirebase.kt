@@ -6,7 +6,7 @@ import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class AppFirebase(){
+class AppFirebase{
 
     private val remoteConfig = Firebase.remoteConfig
 
@@ -17,18 +17,16 @@ class AppFirebase(){
         remoteConfig.setConfigSettingsAsync(configSettings)
     }
 
-    suspend fun getUrl(): Pair<String, Boolean> {
+    suspend fun getUrl(): Pair<String, Boolean>{
         return suspendCoroutine {contination ->
-            try {
-                remoteConfig.fetchAndActivate()
-                    .addOnCompleteListener {
-                        if(it.isComplete){
-                            contination.resume(Pair(remoteConfig.getString("url"), false))
-                        }
+            remoteConfig.fetchAndActivate()
+                .addOnCompleteListener {
+                    if(it.isComplete && it.exception == null){
+                        contination.resume(Pair(remoteConfig.getString("url"), false))
+                    }else{
+                        contination.resume(Pair("", true))
                     }
-            }catch (e : Exception){
-                Pair(e.message.toString(), true)
-            }
+                }
         }
     }
 }

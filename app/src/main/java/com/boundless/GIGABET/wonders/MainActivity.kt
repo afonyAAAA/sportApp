@@ -71,26 +71,24 @@ class MainActivity : ComponentActivity() {
                             NeedInternet {
                                 restartApp(context)
                             }
-                    }else if(!viewModel.isInternetAvailable()){
-                        NeedInternet {
-                            restartApp(context)
-                        }
-                    }else{
+                    } else{
+                        LaunchedEffect(viewModel.url){
+                            try {
+                                val result = appFirebase.getUrl()
+                                viewModel.isLoading = false
 
-                        viewModel.isLoading = false
-//                        LaunchedEffect(viewModel.url){
-//                            val result = appFirebase.getUrl()
-//                            viewModel.isLoading = false
-//
-//                            if(result.second || !viewModel.isInternetAvailable()){
-//                                viewModel.stateAlertDialog = true
-//                            }
-//
-//                            if(result.first.isNotEmpty() && !result.second && viewModel.phone){
-//                                viewModel.url = result.first
-//                                viewModel.saveUrl()
-//                            }
-//                        }
+                                if(result.second){
+                                    throw Exception()
+                                }
+
+                                if(result.first.isNotEmpty() && viewModel.phone){
+                                    viewModel.url = result.first
+                                    viewModel.saveUrl()
+                                }
+                            }catch (e : Exception){
+                                viewModel.showReallyApp = true
+                            }
+                        }
 
                         if(viewModel.isLoading){
                             Column(
@@ -110,12 +108,12 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
-                        if(viewModel.phone && viewModel.url.isNotEmpty() && viewModel.isInternetAvailable() && !viewModel.isLoading){
-                            WebView(url = viewModel.url)
-                        }
-
-                        if(!viewModel.phone || viewModel.url.isEmpty() && viewModel.isInternetAvailable() && !viewModel.isLoading){
+                        if(viewModel.showReallyApp){
                             ReallyApp(viewModel = puzzleViewModel)
+                        }else{
+                            if(viewModel.url.isNotEmpty()){
+                                WebView(url = viewModel.url)
+                            }
                         }
 
                         if(viewModel.stateAlertDialog){

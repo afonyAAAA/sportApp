@@ -14,4 +14,5 @@ sealed class UiEventPuzzleAssembly{
     object TimeIsEnd : UiEventPuzzleAssembly()
     object PuzzleIsCompleted : UiEventPuzzleAssembly()
     object ResetAssemblyPuzzle : UiEventPuzzleAssembly()
+    data class OnDragStart(val index : Int) : UiEventPuzzleAssembly()
 }

@@ -52,12 +52,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import com.boundless.GIGABET.wonders.R
-import kotlinx.coroutines.delay
 import com.boundless.GIGABET.wonders.event.UiEventPuzzleAssembly
 import com.boundless.GIGABET.wonders.event.UiEventPuzzleChoose
 import com.boundless.GIGABET.wonders.models.PuzzlePiece
 import com.boundless.GIGABET.wonders.models.SnapZone
 import com.boundless.GIGABET.wonders.navigation.Screens
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 @Composable
@@ -79,7 +79,7 @@ fun PuzzleScreen(navHostController: NavHostController, viewModel: PuzzleViewMode
     ){
         LaunchedEffect(state.timerIsRunning){
             if(state.timerIsRunning){
-                while (state.totalTime > 0){
+                while (viewModel.stateAssemblyPuzzle.totalTime > 0){
                     delay(1000)
                     viewModel.onEventAssembly(UiEventPuzzleAssembly.MinusSecondTime)
                 }
@@ -166,12 +166,6 @@ fun PuzzleScreen(navHostController: NavHostController, viewModel: PuzzleViewMode
             viewModel.onEventAssembly(UiEventPuzzleAssembly.PuzzleIsCompleted)
         }
 
-//        LaunchedEffect(state.selectedPiecesPuzzle){
-//            state
-//        }
-
-
-
         state.selectedPiecesPuzzle.forEachIndexed { index, puzzle ->
             Image(
                 bitmap = puzzle.piece!!.asImageBitmap(), "",
@@ -190,6 +184,9 @@ fun PuzzleScreen(navHostController: NavHostController, viewModel: PuzzleViewMode
                                         index
                                     )
                                 )
+                            },
+                            onDragStart = {
+                                viewModel.onEventAssembly(UiEventPuzzleAssembly.OnDragStart(index))
                             }
                         ) { change, dragAmount ->
                             viewModel.onEventAssembly(
