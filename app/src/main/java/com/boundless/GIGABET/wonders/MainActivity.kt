@@ -21,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -44,11 +43,12 @@ import com.boundless.GIGABET.wonders.screens.PuzzleViewModel
 import com.boundless.GIGABET.wonders.ui.theme.SportAppTheme
 
 class MainActivity : ComponentActivity() {
-    private fun restartApp(context: Context){
+    private fun restartApp(context: Context) {
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
         intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -59,33 +59,38 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             SportAppTheme {
-
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.BottomEnd
-                ){
-                    if(viewModel.localUrl.isNotEmpty()){
+                ) {
+                    if (viewModel.localUrl.isNotEmpty()) {
                         WebView(url = viewModel.localUrl)
-                    } else{
-                        LaunchedEffect(viewModel.url){
+                    } else {
+                        LaunchedEffect(viewModel.url) {
                             try {
                                 val result = appFirebase.getUrl()
-                                viewModel.isLoading = false
 
-                                if(result.second){
+                                if (result.second) {
                                     throw Exception()
                                 }
 
-                                if(result.first.isNotEmpty()){
+                                if (result.first.isNotEmpty() && result.first.isNotBlank()) {
                                     viewModel.url = result.first
                                     viewModel.saveUrl()
                                 }
-                            }catch (e : Exception){
+
+                                viewModel.isLoading = false
+                            } catch (e: Exception) {
                                 viewModel.showReallyApp = true
                             }
                         }
 
-                        if(viewModel.isLoading){
+                        if (!viewModel.isLoading && viewModel.url.isEmpty() && viewModel.url.isBlank() || viewModel.showReallyApp) {
+                            ReallyApp(viewModel = puzzleViewModel)
+                        } else if (!viewModel.isLoading)
+                            WebView(url = viewModel.url)
+
+                        if (viewModel.isLoading) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center,
@@ -102,31 +107,20 @@ class MainActivity : ComponentActivity() {
                                 CircularProgressIndicator()
                             }
                         }
+                    }
 
-                        if(viewModel.showReallyApp){
-                            ReallyApp(viewModel = puzzleViewModel)
-                        }else{
-                            if(viewModel.url.isNotEmpty()){
-                                WebView(url = viewModel.url)
+                    if (viewModel.stateAlertDialog) {
+                        NeedInternet(
+                            onDismiss = {
+                                restartApp(context)
                             }
-                        }
-
-                        if(viewModel.stateAlertDialog){
-                            NeedInternet(
-                                onDismiss = {
-                                    restartApp(context)
-                                }
-                            )
-                        }
+                        )
                     }
                 }
             }
         }
     }
 }
-
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReallyApp(viewModel: PuzzleViewModel){
     NavPuzzle(puzzleViewModel = viewModel)
@@ -176,8 +170,8 @@ fun WebView(url : String){
 
     AndroidView(
         modifier = Modifier.fillMaxSize(),
-        factory = { context ->
-            WebView(context).apply {
+        factory = { viewContext ->
+            WebView(viewContext).apply {
                 webViewClient = object : WebViewClient(){
                     override fun onPageFinished(view: WebView?, url: String?) {
                         super.onPageFinished(view, url)

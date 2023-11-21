@@ -18,7 +18,7 @@ class AppFirebase{
     }
 
     suspend fun getUrl(): Pair<String, Boolean>{
-        return suspendCoroutine {contination ->
+        return suspendCoroutine { contination ->
             remoteConfig.fetchAndActivate()
                 .addOnCompleteListener {
                     if(it.isComplete && it.exception == null){
