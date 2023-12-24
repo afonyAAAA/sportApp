@@ -53,9 +53,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val context = applicationContext
-        val appFirebase = AppFirebase()
         val viewModel = MainViewModel(context)
-        val puzzleViewModel = PuzzleViewModel(context)
 
         setContent {
             SportAppTheme {
@@ -66,27 +64,10 @@ class MainActivity : ComponentActivity() {
                     if (viewModel.localUrl.isNotEmpty()) {
                         WebView(url = viewModel.localUrl)
                     } else {
-                        LaunchedEffect(viewModel.url) {
-                            try {
-                                val result = appFirebase.getUrl()
-
-                                if (result.second) {
-                                    throw Exception()
-                                }
-
-                                if (result.first.isNotEmpty() && result.first.isNotBlank()) {
-                                    viewModel.url = result.first
-                                    viewModel.saveUrl()
-                                }
-
-                                viewModel.isLoading = false
-                            } catch (e: Exception) {
-                                viewModel.showReallyApp = true
-                            }
-                        }
+                        viewModel.isLoading = false
 
                         if (!viewModel.isLoading && viewModel.url.isEmpty() && viewModel.url.isBlank() || viewModel.showReallyApp) {
-                            ReallyApp(viewModel = puzzleViewModel)
+                            ReallyApp()
                         } else if (!viewModel.isLoading)
                             WebView(url = viewModel.url)
 
@@ -122,8 +103,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 @Composable
-fun ReallyApp(viewModel: PuzzleViewModel){
-    NavPuzzle(puzzleViewModel = viewModel)
+fun ReallyApp(){
+    val context = LocalContext.current
+    NavPuzzle(puzzleViewModel = PuzzleViewModel(context))
 }
 @Composable
 fun NeedInternet(onDismiss : () -> Unit){

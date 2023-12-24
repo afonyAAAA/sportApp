@@ -27,9 +27,9 @@ sealed class Screens(val route : String){
 
 @Composable
 fun NavPuzzle(puzzleViewModel: PuzzleViewModel){
-//    val context = LocalContext.current
-//    val puzzleViewModel : PuzzleViewModel = PuzzleViewModel(context)
+
     val navHostController = rememberNavController()
+
     NavHost(
         navController = navHostController,
         startDestination = Screens.Main.route,

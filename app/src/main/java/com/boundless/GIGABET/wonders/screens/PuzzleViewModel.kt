@@ -7,7 +7,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.boundless.GIGABET.wonders.event.UiEventPuzzleAssembly
 import com.boundless.GIGABET.wonders.event.UiEventPuzzleChoose
 import com.boundless.GIGABET.wonders.event.UiEventSettingsPuzzle
@@ -15,6 +18,8 @@ import com.boundless.GIGABET.wonders.models.Image
 import com.boundless.GIGABET.wonders.models.Position
 import com.boundless.GIGABET.wonders.models.PuzzlePiece
 import com.boundless.GIGABET.wonders.models.SnapZone
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class PuzzleViewModel(val context: Context) : ViewModel() {
 
@@ -22,8 +27,16 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
     var stateChoosePuzzle by mutableStateOf(StateChoosePuzzle())
     var stateSettingsPuzzle by mutableStateOf(StateSettingsPuzzle())
 
+    val stateAssemblyPuzzleLiveData: LiveData<StateAssemblyPuzzle>
+        get() = _stateAssemblyPuzzleLiveData
+    private val _stateAssemblyPuzzleLiveData = MutableLiveData<StateAssemblyPuzzle>()
+
+
+
+
     init {
         readSettingsPuzzle()
+        _stateAssemblyPuzzleLiveData.value = StateAssemblyPuzzle()
         stateChoosePuzzle = stateChoosePuzzle.copy(listImage = getAllPuzzles())
     }
 
@@ -51,7 +64,6 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
                 )
             }
             is UiEventPuzzleAssembly.PuzzleIsChoose -> {
-
                 val piecesPuzzle = splitImage()
 
                 stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
@@ -60,6 +72,10 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
                         piecesPuzzle.map { PuzzlePiece(piece = null, position = it.position) }.toMutableList(),
                     timerIsRunning = stateSettingsPuzzle.timerIsOn
                 )
+
+                if(stateAssemblyPuzzle.timerIsRunning){
+                    runTimer()
+                }
             }
             is UiEventPuzzleAssembly.ContinueDragPiecePuzzle -> {
                 val updatedPuzzles = stateAssemblyPuzzle.selectedPiecesPuzzle.toMutableList()
@@ -67,16 +83,6 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
 
                 updatedPuzzles[event.index] = selectedPuzzle.copy(offsetY = selectedPuzzle.offsetY + event.offset.y, offSetX = selectedPuzzle.offSetX + event.offset.x)
                 stateAssemblyPuzzle = stateAssemblyPuzzle.copy(selectedPiecesPuzzle = updatedPuzzles)
-            }
-            UiEventPuzzleAssembly.MinusSecondTime -> {
-                stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
-                    totalTime = stateAssemblyPuzzle.totalTime - 1
-                )
-            }
-            UiEventPuzzleAssembly.TimeIsEnd -> {
-                stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
-                    isDefeat = true
-                )
             }
             UiEventPuzzleAssembly.PuzzleIsCompleted -> {
                 addCompletedPuzzle()
@@ -89,7 +95,6 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
                     isDefeat = false
                 )
             }
-
              is UiEventPuzzleAssembly.OnDragStart -> {
                  val updatedPuzzles = stateAssemblyPuzzle.selectedPiecesPuzzle.toMutableList()
                  val selectedPuzzle = updatedPuzzles[event.index]
@@ -147,7 +152,22 @@ class PuzzleViewModel(val context: Context) : ViewModel() {
             imageIsVisible = visibleImageState,
             timerIsOn = timerState
         )
+    }
 
+    fun runTimer(){
+       viewModelScope.launch {
+           while (stateAssemblyPuzzle.totalTime != 0){
+               delay(1000)
+               stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
+                   totalTime = stateAssemblyPuzzle.totalTime - 1
+               )
+           }
+           if(!stateAssemblyPuzzle.isVictory){
+               stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
+                   isDefeat = true
+               )
+           }
+       }
     }
 
     private fun editVisibleImages(){

@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -63,7 +64,7 @@ import kotlin.math.roundToInt
 @Composable
 fun PuzzleScreen(navHostController: NavHostController, viewModel: PuzzleViewModel){
 
-    val state = viewModel.stateAssemblyPuzzle
+    val state = viewModel.stateAssemblyPuzzleLiveData.value!!
 
     Image(
         painter = painterResource(id = R.drawable.background),
@@ -77,16 +78,6 @@ fun PuzzleScreen(navHostController: NavHostController, viewModel: PuzzleViewMode
             .verticalScroll(rememberScrollState())
             .fillMaxSize()
     ){
-        LaunchedEffect(state.timerIsRunning){
-            if(state.timerIsRunning){
-                while (viewModel.stateAssemblyPuzzle.totalTime > 0){
-                    delay(1000)
-                    viewModel.onEventAssembly(UiEventPuzzleAssembly.MinusSecondTime)
-                }
-                viewModel.onEventAssembly(UiEventPuzzleAssembly.TimeIsEnd)
-            }
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -97,48 +88,71 @@ fun PuzzleScreen(navHostController: NavHostController, viewModel: PuzzleViewMode
                 ProgressIndicator(progress = (state.totalTime.toFloat() / 300f) * 1.0f)
             }
 
-            var counter = 0
+            PositionsForPuzzles(viewModel = viewModel)
+            
+            PuzzlesList(viewModel = viewModel)
 
-            (1..5).forEach{ column ->
-                Column {
-                    Row {
-                        state.positionsPiecePuzzles.subList(counter, counter + 5).forEach{ positionInRow ->
-                            AreaOfPuzzlePiece(positionInRow){ snapZone ->
-                                if(state.snapZones.size != 25){
-                                    viewModel.onEventAssembly(UiEventPuzzleAssembly.SetSnapZone(snapZone))
-                                }
-                            }
-                        }
-                        counter += 5
-                    }
-                }
-            }
-
-            LazyHorizontalGrid(
-                rows = GridCells.Fixed(2),
-                contentPadding = PaddingValues(20.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(350.dp),
-                verticalArrangement = Arrangement.Center
-            ){
-                items(
-                    state.piecesPuzzle,
-                    key = { listItem ->
-                        listItem.id
-                    }
-                ){ piece ->
-                    PuzzlePiece(puzzlePiece = piece,
-                        onTap = { puzzlePiece, offSet ->
-                            viewModel.onEventAssembly(UiEventPuzzleAssembly.OnTapPiecePuzzle(offSet, puzzlePiece))
-                        }
-                    )
-                }
-            }
         }
 
-        if (state.isDefeat){
-            AlertDialogDefeat {
+        DraggedPuzzles(viewModel = viewModel)
+        
+        if(state.isDefeat || state.isVictory){
+            ResultsAssemblyPuzzle(viewModel = viewModel, navHostController = navHostController)
+        }
+
+        BackHandler {
+            navHostController.popBackStack()
+            viewModel.onEventAssembly(UiEventPuzzleAssembly.ResetAssemblyPuzzle)
+        }
+    }
+}
+
+@Composable
+fun PositionsForPuzzles(viewModel: PuzzleViewModel){
+
+    var counter by remember { mutableIntStateOf(0) }
+
+    val state = viewModel.stateAssemblyPuzzleLiveData.value!!
+
+    (1..5).forEach{ column ->
+        Column {
+            Row {
+                state.positionsPiecePuzzles.subList(counter, counter + 5).forEach{ positionInRow ->
+                    AreaOfPuzzlePiece(positionInRow){ snapZone ->
+                        if(state.snapZones.size != 25){
+                            viewModel.onEventAssembly(UiEventPuzzleAssembly.SetSnapZone(snapZone))
+                        }
+                    }
+                }
+                counter += 5
+            }
+        }
+    }
+}
+
+@Composable
+fun ResultsAssemblyPuzzle(
+    viewModel: PuzzleViewModel,
+    navHostController: NavHostController
+){
+    
+    val state = viewModel.stateAssemblyPuzzle
+    
+    if (state.isDefeat){
+        AlertDialogDefeat {
+            navHostController.navigate(
+                Screens.Puzzles.route,
+                NavOptions.Builder()
+                    .setPopUpTo(Screens.Main.route, false)
+                    .build()
+            )
+            viewModel.onEventAssembly(UiEventPuzzleAssembly.ResetAssemblyPuzzle)
+        }
+    }
+
+    if(state.isVictory){
+        AlertDialogVictory(
+            onDismiss = {
                 navHostController.navigate(
                     Screens.Puzzles.route,
                     NavOptions.Builder()
@@ -146,66 +160,81 @@ fun PuzzleScreen(navHostController: NavHostController, viewModel: PuzzleViewMode
                         .build()
                 )
                 viewModel.onEventAssembly(UiEventPuzzleAssembly.ResetAssemblyPuzzle)
-            }
-        }
+                viewModel.onEventChoosePuzzle(UiEventPuzzleChoose.ShowImages)
+            },
+            completedPuzzle = viewModel.stateChoosePuzzle.selectedPuzzle!!.image
+        )
+        viewModel.onEventAssembly(UiEventPuzzleAssembly.PuzzleIsCompleted)
+    }
+}
 
-        if(state.isVictory){
-            AlertDialogVictory(
-                onDismiss = {
-                    navHostController.navigate(
-                        Screens.Puzzles.route,
-                        NavOptions.Builder()
-                            .setPopUpTo(Screens.Main.route, false)
-                            .build()
+@Composable
+fun DraggedPuzzles(viewModel: PuzzleViewModel){
+    
+    val state = viewModel.stateAssemblyPuzzle
+    
+    state.selectedPiecesPuzzle.forEachIndexed { index, puzzle ->
+        Image(
+            bitmap = puzzle.piece!!.asImageBitmap(), "",
+            modifier = Modifier
+                .offset {
+                    IntOffset(
+                        puzzle.offSetX.roundToInt(),
+                        puzzle.offsetY.roundToInt()
                     )
-                    viewModel.onEventAssembly(UiEventPuzzleAssembly.ResetAssemblyPuzzle)
-                    viewModel.onEventChoosePuzzle(UiEventPuzzleChoose.ShowImages)
-                },
-                completedPuzzle = viewModel.stateChoosePuzzle.selectedPuzzle!!.image
-            )
-            viewModel.onEventAssembly(UiEventPuzzleAssembly.PuzzleIsCompleted)
-        }
-
-        state.selectedPiecesPuzzle.forEachIndexed { index, puzzle ->
-            Image(
-                bitmap = puzzle.piece!!.asImageBitmap(), "",
-                modifier = Modifier
-                    .offset {
-                        IntOffset(
-                            puzzle.offSetX.roundToInt(),
-                            puzzle.offsetY.roundToInt()
-                        )
-                    }
-                    .pointerInput(Unit) {
-                        detectDragGestures(
-                            onDragEnd = {
-                                viewModel.onEventAssembly(
-                                    UiEventPuzzleAssembly.DragEndPiecePuzzle(
-                                        index
-                                    )
-                                )
-                            },
-                            onDragStart = {
-                                viewModel.onEventAssembly(UiEventPuzzleAssembly.OnDragStart(index))
-                            }
-                        ) { change, dragAmount ->
+                }
+                .pointerInput(Unit) {
+                    detectDragGestures(
+                        onDragEnd = {
                             viewModel.onEventAssembly(
-                                UiEventPuzzleAssembly.ContinueDragPiecePuzzle(
-                                    dragAmount,
-                                    puzzle,
+                                UiEventPuzzleAssembly.DragEndPiecePuzzle(
                                     index
                                 )
                             )
-                            change.consumeAllChanges()
+                        },
+                        onDragStart = {
+                            viewModel.onEventAssembly(UiEventPuzzleAssembly.OnDragStart(index))
                         }
+                    ) { change, dragAmount ->
+                        viewModel.onEventAssembly(
+                            UiEventPuzzleAssembly.ContinueDragPiecePuzzle(
+                                dragAmount,
+                                puzzle,
+                                index
+                            )
+                        )
+                        change.consumeAllChanges()
                     }
-                    .size(50.dp)
-            )
-        }
+                }
+                .size(50.dp)
+        )
+    }
+}
 
-        BackHandler {
-            navHostController.popBackStack()
-            viewModel.onEventAssembly(UiEventPuzzleAssembly.ResetAssemblyPuzzle)
+@Composable
+fun PuzzlesList(viewModel: PuzzleViewModel){
+    
+    val state = viewModel.stateAssemblyPuzzle
+    
+    LazyHorizontalGrid(
+        rows = GridCells.Fixed(2),
+        contentPadding = PaddingValues(20.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(350.dp),
+        verticalArrangement = Arrangement.Center
+    ){
+        items(
+            state.piecesPuzzle,
+            key = { listItem ->
+                listItem.id
+            }
+        ){ piece ->
+            PuzzlePiece(puzzlePiece = piece,
+                onTap = { puzzlePiece, offSet ->
+                    viewModel.onEventAssembly(UiEventPuzzleAssembly.OnTapPiecePuzzle(offSet, puzzlePiece))
+                }
+            )
         }
     }
 }

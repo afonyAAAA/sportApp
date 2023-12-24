@@ -10,8 +10,6 @@ sealed class UiEventPuzzleAssembly{
     data class ContinueDragPiecePuzzle(val offset: Offset, val puzzlePiece: PuzzlePiece, val index : Int) : UiEventPuzzleAssembly()
     data class DragEndPiecePuzzle(val index: Int) : UiEventPuzzleAssembly()
     data class SetSnapZone(val snapZone : SnapZone) : UiEventPuzzleAssembly()
-    object MinusSecondTime : UiEventPuzzleAssembly()
-    object TimeIsEnd : UiEventPuzzleAssembly()
     object PuzzleIsCompleted : UiEventPuzzleAssembly()
     object ResetAssemblyPuzzle : UiEventPuzzleAssembly()
     data class OnDragStart(val index : Int) : UiEventPuzzleAssembly()
