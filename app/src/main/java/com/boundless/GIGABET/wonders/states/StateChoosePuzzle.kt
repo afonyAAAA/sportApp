@@ -1,4 +1,4 @@
-package com.boundless.GIGABET.wonders.screens
+package com.boundless.GIGABET.wonders.states
 
 import com.boundless.GIGABET.wonders.models.Image
 

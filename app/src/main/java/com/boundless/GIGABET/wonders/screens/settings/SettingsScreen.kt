@@ -1,4 +1,4 @@
-package com.boundless.GIGABET.wonders.screens
+package com.boundless.GIGABET.wonders.screens.settings
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,10 +15,12 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,11 +28,36 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.boundless.GIGABET.wonders.R
 import com.boundless.GIGABET.wonders.event.UiEventSettingsPuzzle
+import com.boundless.GIGABET.wonders.screens.assemblyPuzzle.AssemblyPuzzleViewModel
 
 @Composable
-fun SettingsScreen(navHostController: NavHostController, puzzleViewModel: PuzzleViewModel){
+fun SettingsScreen(navHostController: NavHostController){
 
-    val state = puzzleViewModel.stateSettingsPuzzle
+    val context = LocalContext.current
+
+    val viewModel = remember {
+        SettingsViewModel(context)
+    }
+
+    val state = viewModel.stateSettingsPuzzle
+
+    val changeVisibleStateImage : (Boolean) -> Unit = remember(viewModel) {
+        {
+            viewModel.onEventSettingsPuzzle(UiEventSettingsPuzzle.VisibleStateImageChoose(it))
+        }
+    }
+
+    val changeTimerState : (Boolean) -> Unit = remember(viewModel) {
+        {
+            viewModel.onEventSettingsPuzzle(UiEventSettingsPuzzle.TimerStateImageChoose(it))
+        }
+    }
+
+    val changeResetCompletedPuzzle = remember(viewModel) {
+        {
+            viewModel.onEventSettingsPuzzle(UiEventSettingsPuzzle.ResetCompletedPuzzle)
+        }
+    }
 
     Image(
         painter = painterResource(id = R.drawable.background),
@@ -45,27 +72,24 @@ fun SettingsScreen(navHostController: NavHostController, puzzleViewModel: Puzzle
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Column(Modifier.fillMaxWidth().background(Color.Black.copy(0.5f))) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .background(Color.Black.copy(0.5f))) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = "Puzzle pictures are open", color = MaterialTheme.colorScheme.onPrimary)
                 Spacer(modifier = Modifier.width(8.dp))
-                Checkbox(checked = state.imageIsVisible, onCheckedChange = {
-                    puzzleViewModel.onEventSettingsPuzzle(UiEventSettingsPuzzle.VisibleStateImageChoose(it))
-                })
+                Checkbox(checked = state.imageIsVisible, onCheckedChange = changeVisibleStateImage)
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = "Assembling puzzles against time", color = MaterialTheme.colorScheme.onPrimary)
                 Spacer(modifier = Modifier.width(8.dp))
-                Checkbox(checked = state.timerIsOn, onCheckedChange = {
-                    puzzleViewModel.onEventSettingsPuzzle(UiEventSettingsPuzzle.TimerStateImageChoose(it))
-                })
+                Checkbox(checked = state.timerIsOn, onCheckedChange = changeTimerState)
             }
 
             Button(
-                onClick = {
-                    puzzleViewModel.onEventSettingsPuzzle(UiEventSettingsPuzzle.ResetCompletedPuzzle)
-                },
+                onClick = changeResetCompletedPuzzle,
                 modifier = Modifier.align(Alignment.CenterHorizontally)) {
                 Text(text = "Reset completed puzzles")
             }

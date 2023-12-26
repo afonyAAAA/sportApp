@@ -1,4 +1,4 @@
-package com.boundless.GIGABET.wonders.screens
+package com.boundless.GIGABET.wonders.screens.assemblyPuzzle
 
 import android.graphics.Bitmap
 import androidx.activity.compose.BackHandler
@@ -30,7 +30,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -42,11 +41,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -54,92 +55,65 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import com.boundless.GIGABET.wonders.R
 import com.boundless.GIGABET.wonders.event.UiEventPuzzleAssembly
-import com.boundless.GIGABET.wonders.event.UiEventPuzzleChoose
 import com.boundless.GIGABET.wonders.models.PuzzlePiece
 import com.boundless.GIGABET.wonders.models.SnapZone
 import com.boundless.GIGABET.wonders.navigation.Screens
-import kotlinx.coroutines.delay
+import com.boundless.GIGABET.wonders.utils.HelperApp
 import kotlin.math.roundToInt
 
 @Composable
-fun PuzzleScreen(navHostController: NavHostController, viewModel: PuzzleViewModel){
+fun PuzzleScreen(navHostController: NavHostController){
 
-    val state = viewModel.stateAssemblyPuzzleLiveData.value!!
+    val context = LocalContext.current
 
-    Image(
-        painter = painterResource(id = R.drawable.background),
-        modifier = Modifier.fillMaxSize(),
-        contentScale = ContentScale.Crop,
-        contentDescription = ""
-    )
-
-    Box(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .fillMaxSize()
-    ){
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            if(state.timerIsRunning){
-                ProgressIndicator(progress = (state.totalTime.toFloat() / 300f) * 1.0f)
-            }
-
-            PositionsForPuzzles(viewModel = viewModel)
-            
-            PuzzlesList(viewModel = viewModel)
-
-        }
-
-        DraggedPuzzles(viewModel = viewModel)
-        
-        if(state.isDefeat || state.isVictory){
-            ResultsAssemblyPuzzle(viewModel = viewModel, navHostController = navHostController)
-        }
-
-        BackHandler {
-            navHostController.popBackStack()
-            viewModel.onEventAssembly(UiEventPuzzleAssembly.ResetAssemblyPuzzle)
-        }
+    val viewModel = remember {
+        AssemblyPuzzleViewModel(
+            context = context,
+            selectedPuzzle = HelperApp.Puzzle.puzzle,
+            settings = HelperApp.Settings.state
+        )
     }
-}
-
-@Composable
-fun PositionsForPuzzles(viewModel: PuzzleViewModel){
-
-    var counter by remember { mutableIntStateOf(0) }
-
-    val state = viewModel.stateAssemblyPuzzleLiveData.value!!
-
-    (1..5).forEach{ column ->
-        Column {
-            Row {
-                state.positionsPiecePuzzles.subList(counter, counter + 5).forEach{ positionInRow ->
-                    AreaOfPuzzlePiece(positionInRow){ snapZone ->
-                        if(state.snapZones.size != 25){
-                            viewModel.onEventAssembly(UiEventPuzzleAssembly.SetSnapZone(snapZone))
-                        }
-                    }
-                }
-                counter += 5
-            }
-        }
-    }
-}
-
-@Composable
-fun ResultsAssemblyPuzzle(
-    viewModel: PuzzleViewModel,
-    navHostController: NavHostController
-){
-    
     val state = viewModel.stateAssemblyPuzzle
-    
-    if (state.isDefeat){
-        AlertDialogDefeat {
+
+    val onSetSnapZone : (SnapZone) -> Unit = remember (viewModel) {
+        { snapZone ->
+            viewModel.onEventAssembly(UiEventPuzzleAssembly.SetSnapZone(snapZone))
+        }
+    }
+
+    val onTapPuzzlesList : (PuzzlePiece, Offset) -> Unit = remember (viewModel) {
+        { puzzlePiece, offSet ->
+            viewModel.onEventAssembly(UiEventPuzzleAssembly.OnTapPiecePuzzle(offSet, puzzlePiece))
+        }
+    }
+
+    val onDragStart : (Int) -> Unit = remember (viewModel) {
+        { index ->
+            viewModel.onEventAssembly(UiEventPuzzleAssembly.OnDragStart(index))
+        }
+    }
+
+    val onDragEnd : (Int) -> Unit = remember (viewModel) {
+        { index ->
+            viewModel.onEventAssembly(UiEventPuzzleAssembly.DragEndPiecePuzzle(index))
+        }
+    }
+
+    val onDrag : (Offset, PointerInputChange, PuzzlePiece, Int) -> Unit = remember(viewModel) {
+        { dragAmount, change, puzzle, index ->
+            viewModel.onEventAssembly(
+                UiEventPuzzleAssembly.ContinueDragPiecePuzzle(
+                    dragAmount,
+                    puzzle,
+                    index
+                )
+            )
+            change.consumeAllChanges()
+        }
+    }
+
+    val onDismiss = remember(viewModel) {
+        {
             navHostController.navigate(
                 Screens.Puzzles.route,
                 NavOptions.Builder()
@@ -150,30 +124,120 @@ fun ResultsAssemblyPuzzle(
         }
     }
 
-    if(state.isVictory){
-        AlertDialogVictory(
-            onDismiss = {
-                navHostController.navigate(
-                    Screens.Puzzles.route,
-                    NavOptions.Builder()
-                        .setPopUpTo(Screens.Main.route, false)
-                        .build()
-                )
-                viewModel.onEventAssembly(UiEventPuzzleAssembly.ResetAssemblyPuzzle)
-                viewModel.onEventChoosePuzzle(UiEventPuzzleChoose.ShowImages)
-            },
-            completedPuzzle = viewModel.stateChoosePuzzle.selectedPuzzle!!.image
+    val onDismissOnVictory = remember(viewModel) {
+        {
+            viewModel.onEventAssembly(UiEventPuzzleAssembly.PuzzleIsCompleted)
+        }
+    }
+
+    val onBackPressed = remember (viewModel) {
+        {
+            navHostController.popBackStack()
+            viewModel.onEventAssembly(UiEventPuzzleAssembly.ResetAssemblyPuzzle)
+        }
+    }
+
+    Image(
+        painter = painterResource(id = R.drawable.background),
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop,
+        contentDescription = ""
+    )
+
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if(state.timerIsRunning){
+            ProgressIndicator(progress = (state.totalTime.toFloat() / 300f) * 1.0f)
+        }
+
+        PositionsForPuzzles(
+            state.positionsPiecePuzzles,
+            onSetSnapZone = onSetSnapZone
         )
-        viewModel.onEventAssembly(UiEventPuzzleAssembly.PuzzleIsCompleted)
+
+        PuzzlesList(
+            state.piecesPuzzle,
+            onTap = onTapPuzzlesList
+        )
+    }
+
+    DraggedPuzzles(
+        state.selectedPiecesPuzzle,
+        onDragEnd = onDragEnd,
+        onDragStart = onDragStart,
+        onDrag = onDrag
+    )
+
+    ResultsAssemblyPuzzle(
+        onDismiss = onDismiss,
+        isVictory = state.isVictory,
+        onDismissOnVictory = onDismissOnVictory,
+        choosePuzzlePiece = state.selectedPuzzle.image!!
+    )
+
+    BackHandler(onBack = onBackPressed)
+}
+
+@Composable
+fun PositionsForPuzzles(
+    positionsPiecePuzzles: MutableList<PuzzlePiece>,
+    onSetSnapZone: (SnapZone) -> Unit
+){
+    var counter by remember { mutableIntStateOf(0) }
+
+    (1..5).forEach{ column ->
+        Column {
+            Row {
+                positionsPiecePuzzles.subList(counter, counter + 5).forEach{ positionInRow ->
+                    AreaOfPuzzlePiece(positionInRow){ snapZone ->
+                        onSetSnapZone(snapZone)
+                    }
+                }
+            }
+            if(counter != 20){
+                counter += 5
+            }
+        }
     }
 }
 
 @Composable
-fun DraggedPuzzles(viewModel: PuzzleViewModel){
-    
-    val state = viewModel.stateAssemblyPuzzle
-    
-    state.selectedPiecesPuzzle.forEachIndexed { index, puzzle ->
+fun ResultsAssemblyPuzzle(
+    isVictory : Boolean,
+    onDismiss: () -> Unit,
+    onDismissOnVictory : () -> Unit,
+    choosePuzzlePiece: Bitmap
+){
+    val isDefeat = !isVictory
+
+    if (isDefeat){
+        AlertDialogDefeat(
+            onDismiss = onDismiss
+        )
+    }
+
+    if(isVictory){
+        AlertDialogVictory(
+            onDismiss = onDismiss,
+            completedPuzzle = choosePuzzlePiece
+        )
+        onDismiss()
+        onDismissOnVictory()
+    }
+}
+
+@Composable
+fun DraggedPuzzles(
+    selectedPiecesPuzzle: MutableList<PuzzlePiece>,
+    onDragEnd : (Int) -> Unit,
+    onDragStart : (Int) -> Unit,
+    onDrag : (Offset, PointerInputChange, PuzzlePiece, Int) -> Unit
+){
+    selectedPiecesPuzzle.forEachIndexed { index, puzzle ->
         Image(
             bitmap = puzzle.piece!!.asImageBitmap(), "",
             modifier = Modifier
@@ -186,24 +250,18 @@ fun DraggedPuzzles(viewModel: PuzzleViewModel){
                 .pointerInput(Unit) {
                     detectDragGestures(
                         onDragEnd = {
-                            viewModel.onEventAssembly(
-                                UiEventPuzzleAssembly.DragEndPiecePuzzle(
-                                    index
-                                )
-                            )
+                            onDragEnd(index)
                         },
                         onDragStart = {
-                            viewModel.onEventAssembly(UiEventPuzzleAssembly.OnDragStart(index))
+                            onDragStart(index)
                         }
                     ) { change, dragAmount ->
-                        viewModel.onEventAssembly(
-                            UiEventPuzzleAssembly.ContinueDragPiecePuzzle(
-                                dragAmount,
-                                puzzle,
-                                index
-                            )
+                        onDrag(
+                            dragAmount,
+                            change,
+                            puzzle,
+                            index
                         )
-                        change.consumeAllChanges()
                     }
                 }
                 .size(50.dp)
@@ -212,10 +270,10 @@ fun DraggedPuzzles(viewModel: PuzzleViewModel){
 }
 
 @Composable
-fun PuzzlesList(viewModel: PuzzleViewModel){
-    
-    val state = viewModel.stateAssemblyPuzzle
-    
+fun PuzzlesList(
+    piecesPuzzle:  MutableList<PuzzlePiece>,
+    onTap: (PuzzlePiece, Offset) -> Unit
+){
     LazyHorizontalGrid(
         rows = GridCells.Fixed(2),
         contentPadding = PaddingValues(20.dp),
@@ -225,14 +283,14 @@ fun PuzzlesList(viewModel: PuzzleViewModel){
         verticalArrangement = Arrangement.Center
     ){
         items(
-            state.piecesPuzzle,
+            piecesPuzzle,
             key = { listItem ->
                 listItem.id
             }
         ){ piece ->
             PuzzlePiece(puzzlePiece = piece,
                 onTap = { puzzlePiece, offSet ->
-                    viewModel.onEventAssembly(UiEventPuzzleAssembly.OnTapPiecePuzzle(offSet, puzzlePiece))
+                    onTap(puzzlePiece, offSet)
                 }
             )
         }

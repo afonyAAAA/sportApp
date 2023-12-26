@@ -24,7 +24,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,8 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.boundless.GIGABET.wonders.navigation.NavPuzzle
 import com.boundless.GIGABET.wonders.screens.MainViewModel
-import com.boundless.GIGABET.wonders.screens.PuzzleViewModel
+import com.boundless.GIGABET.wonders.screens.settings.SettingsViewModel
 import com.boundless.GIGABET.wonders.ui.theme.SportAppTheme
+import com.boundless.GIGABET.wonders.utils.HelperApp
 
 class MainActivity : ComponentActivity() {
     private fun restartApp(context: Context) {
@@ -54,6 +54,9 @@ class MainActivity : ComponentActivity() {
 
         val context = applicationContext
         val viewModel = MainViewModel(context)
+        val stateSettings = SettingsViewModel(context).stateSettingsPuzzle
+
+        HelperApp.Settings.state = stateSettings
 
         setContent {
             SportAppTheme {
@@ -104,8 +107,7 @@ class MainActivity : ComponentActivity() {
 }
 @Composable
 fun ReallyApp(){
-    val context = LocalContext.current
-    NavPuzzle(puzzleViewModel = PuzzleViewModel(context))
+    NavPuzzle()
 }
 @Composable
 fun NeedInternet(onDismiss : () -> Unit){

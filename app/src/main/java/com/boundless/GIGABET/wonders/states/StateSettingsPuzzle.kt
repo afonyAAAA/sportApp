@@ -1,4 +1,4 @@
-package com.boundless.GIGABET.wonders.screens
+package com.boundless.GIGABET.wonders.states
 
 data class StateSettingsPuzzle(
     val imageIsVisible : Boolean = false,

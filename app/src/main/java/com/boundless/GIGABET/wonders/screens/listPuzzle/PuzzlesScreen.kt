@@ -1,7 +1,6 @@
-package com.boundless.GIGABET.wonders.screens
+package com.boundless.GIGABET.wonders.screens.listPuzzle
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,25 +21,41 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.boundless.GIGABET.wonders.R
-import com.boundless.GIGABET.wonders.event.UiEventPuzzleAssembly
 import com.boundless.GIGABET.wonders.event.UiEventPuzzleChoose
 import com.boundless.GIGABET.wonders.models.Image
 import com.boundless.GIGABET.wonders.navigation.Screens
+import com.boundless.GIGABET.wonders.states.StateChoosePuzzle
+import com.boundless.GIGABET.wonders.utils.HelperApp
+
+val stateSettings = HelperApp.Settings.state
 
 @Composable
-fun PuzzlesScreen(navHostController: NavHostController, viewModel: PuzzleViewModel){
+fun PuzzlesScreen(navHostController: NavHostController){
 
+    val context = LocalContext.current
+    val viewModel = remember { ChoosePuzzleViewModel(context)}
     val state = viewModel.stateChoosePuzzle
+    val onSelectImage : (Image) -> Unit = remember(viewModel) {
+        { selectedImage ->
+            HelperApp.Puzzle.puzzle = selectedImage
+            viewModel.onEventChoosePuzzle(UiEventPuzzleChoose.ImageIsChoose(selectedImage))
+            navHostController.navigate(
+                Screens.Puzzle.route
+            )
+        }
+    }
 
     Image(
         painter = painterResource(id = R.drawable.background),
@@ -67,23 +82,20 @@ fun PuzzlesScreen(navHostController: NavHostController, viewModel: PuzzleViewMod
             }
         }
         Spacer(modifier = Modifier.height(50.dp))
-        ListImages(state = state, stateSettings = viewModel.stateSettingsPuzzle) { selectedImage ->
-            viewModel.onEventChoosePuzzle(UiEventPuzzleChoose.ImageIsChoose(selectedImage))
-            viewModel.onEventAssembly(UiEventPuzzleAssembly.PuzzleIsChoose)
-            navHostController.navigate(
-                Screens.Puzzle.route
-            )
-        }
+        ListImages(
+            listImage = state.listImage,
+            onClick = onSelectImage
+        )
     }
 }
 
 @Composable
-fun ListImages(state : StateChoosePuzzle, stateSettings: StateSettingsPuzzle, onClick: (Image) -> Unit){
+fun ListImages( listImage: List<Image>, onClick: (Image) -> Unit){
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ){
-        items(state.listImage){ image ->
+        items(listImage){ image ->
             ItemImage(item = image, settingsVisibleImage = stateSettings.imageIsVisible) {
                 onClick(image)
             }
@@ -106,7 +118,7 @@ fun ItemImage(item : Image, settingsVisibleImage : Boolean, onClick: () -> Unit)
             verticalArrangement = Arrangement.spacedBy(15.dp, Alignment.CenterVertically)
         ) {
             if(item.visible || settingsVisibleImage){
-                Image(bitmap = item.image.asImageBitmap(), contentDescription = "",
+                Image(bitmap = item.image!!.asImageBitmap(), contentDescription = "",
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
                         .size(100.dp))
