@@ -13,4 +13,7 @@ sealed class UiEventPuzzleAssembly{
     object PuzzleIsCompleted : UiEventPuzzleAssembly()
     object ResetAssemblyPuzzle : UiEventPuzzleAssembly()
     data class OnDragStart(val index : Int) : UiEventPuzzleAssembly()
+    data class SetOffSet(val offSet : Offset) : UiEventPuzzleAssembly()
+    object NextRow: UiEventPuzzleAssembly()
+
 }

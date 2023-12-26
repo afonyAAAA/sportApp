@@ -9,14 +9,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boundless.GIGABET.wonders.event.UiEventPuzzleAssembly
-import com.boundless.GIGABET.wonders.event.UiEventSettingsPuzzle
 import com.boundless.GIGABET.wonders.models.Image
 import com.boundless.GIGABET.wonders.models.Position
 import com.boundless.GIGABET.wonders.models.PuzzlePiece
 import com.boundless.GIGABET.wonders.models.SnapZone
 import com.boundless.GIGABET.wonders.states.StateAssemblyPuzzle
 import com.boundless.GIGABET.wonders.states.StateSettingsPuzzle
-import com.boundless.GIGABET.wonders.utils.HelperApp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -97,11 +95,22 @@ class AssemblyPuzzleViewModel(
                      lastOffset = Offset(selectedPuzzle.offSetX, selectedPuzzle.offsetY)
                  )
              }
+             UiEventPuzzleAssembly.NextRow -> {
+                 stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
+                     counter = stateAssemblyPuzzle.counter + 5
+                 )
+             }
+
+             is UiEventPuzzleAssembly.SetOffSet -> {
+                 stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
+                     offSetPuzzle = event.offSet
+                 )
+             }
          }
     }
 
 
-    fun runTimer(){
+    private fun runTimer(){
        viewModelScope.launch {
            while (stateAssemblyPuzzle.totalTime != 0){
                delay(1000)

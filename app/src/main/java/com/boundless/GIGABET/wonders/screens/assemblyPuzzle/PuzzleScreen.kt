@@ -30,11 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +41,7 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
@@ -61,6 +58,7 @@ import com.boundless.GIGABET.wonders.navigation.Screens
 import com.boundless.GIGABET.wonders.utils.HelperApp
 import kotlin.math.roundToInt
 
+
 @Composable
 fun PuzzleScreen(navHostController: NavHostController){
 
@@ -73,33 +71,34 @@ fun PuzzleScreen(navHostController: NavHostController){
             settings = HelperApp.Settings.state
         )
     }
+
     val state = viewModel.stateAssemblyPuzzle
 
-    val onSetSnapZone : (SnapZone) -> Unit = remember (viewModel) {
+    val onSetSnapZone : (SnapZone) -> Unit = remember  {
         { snapZone ->
             viewModel.onEventAssembly(UiEventPuzzleAssembly.SetSnapZone(snapZone))
         }
     }
 
-    val onTapPuzzlesList : (PuzzlePiece, Offset) -> Unit = remember (viewModel) {
+    val onTapPuzzlesList : (PuzzlePiece, Offset) -> Unit = remember  {
         { puzzlePiece, offSet ->
             viewModel.onEventAssembly(UiEventPuzzleAssembly.OnTapPiecePuzzle(offSet, puzzlePiece))
         }
     }
 
-    val onDragStart : (Int) -> Unit = remember (viewModel) {
+    val onDragStart : (Int) -> Unit = remember  {
         { index ->
             viewModel.onEventAssembly(UiEventPuzzleAssembly.OnDragStart(index))
         }
     }
 
-    val onDragEnd : (Int) -> Unit = remember (viewModel) {
+    val onDragEnd : (Int) -> Unit = remember  {
         { index ->
             viewModel.onEventAssembly(UiEventPuzzleAssembly.DragEndPiecePuzzle(index))
         }
     }
 
-    val onDrag : (Offset, PointerInputChange, PuzzlePiece, Int) -> Unit = remember(viewModel) {
+    val onDrag : (Offset, PointerInputChange, PuzzlePiece, Int) -> Unit = remember {
         { dragAmount, change, puzzle, index ->
             viewModel.onEventAssembly(
                 UiEventPuzzleAssembly.ContinueDragPiecePuzzle(
@@ -112,7 +111,7 @@ fun PuzzleScreen(navHostController: NavHostController){
         }
     }
 
-    val onDismiss = remember(viewModel) {
+    val onDismiss = remember {
         {
             navHostController.navigate(
                 Screens.Puzzles.route,
@@ -124,16 +123,29 @@ fun PuzzleScreen(navHostController: NavHostController){
         }
     }
 
-    val onDismissOnVictory = remember(viewModel) {
+    val onDismissOnVictory = remember {
         {
             viewModel.onEventAssembly(UiEventPuzzleAssembly.PuzzleIsCompleted)
         }
     }
 
-    val onBackPressed = remember (viewModel) {
+    val onBackPressed = remember  {
         {
             navHostController.popBackStack()
             viewModel.onEventAssembly(UiEventPuzzleAssembly.ResetAssemblyPuzzle)
+        }
+    }
+
+    val onNextRow = remember {
+        {
+            viewModel.onEventAssembly(UiEventPuzzleAssembly.NextRow)
+        }
+    }
+
+    val onGloballySetPosition : (LayoutCoordinates) -> Unit = remember {
+        {   layoutCoordinates ->
+            val offsetBox = layoutCoordinates.positionInRoot()
+            viewModel.onEventAssembly(UiEventPuzzleAssembly.SetOffSet(offsetBox))
         }
     }
 
@@ -155,12 +167,16 @@ fun PuzzleScreen(navHostController: NavHostController){
         }
 
         PositionsForPuzzles(
-            state.positionsPiecePuzzles,
-            onSetSnapZone = onSetSnapZone
+            positionsPiecePuzzles = state.positionsPiecePuzzles,
+            onSetSnapZone = onSetSnapZone,
+            counter = state.counter,
+            onNextRow = onNextRow
         )
 
         PuzzlesList(
             state.piecesPuzzle,
+            offset = state.offSetPuzzle,
+            onGloballySetPosition = onGloballySetPosition,
             onTap = onTapPuzzlesList
         )
     }
@@ -172,12 +188,13 @@ fun PuzzleScreen(navHostController: NavHostController){
         onDrag = onDrag
     )
 
-    ResultsAssemblyPuzzle(
-        onDismiss = onDismiss,
-        isVictory = state.isVictory,
-        onDismissOnVictory = onDismissOnVictory,
-        choosePuzzlePiece = state.selectedPuzzle.image!!
-    )
+    if(state.totalTime == 0 || state.isVictory)
+        ResultsAssemblyPuzzle(
+            onDismiss = onDismiss,
+            isVictory = state.isVictory,
+            onDismissOnVictory = onDismissOnVictory,
+            choosePuzzlePiece = state.selectedPuzzle.image!!
+        )
 
     BackHandler(onBack = onBackPressed)
 }
@@ -185,11 +202,11 @@ fun PuzzleScreen(navHostController: NavHostController){
 @Composable
 fun PositionsForPuzzles(
     positionsPiecePuzzles: MutableList<PuzzlePiece>,
-    onSetSnapZone: (SnapZone) -> Unit
+    onSetSnapZone: (SnapZone) -> Unit,
+    counter : Int,
+    onNextRow : () -> Unit
 ){
-    var counter by remember { mutableIntStateOf(0) }
-
-    (1..5).forEach{ column ->
+    listOf(1, 2, 3, 4, 5).forEach { _ ->
         Column {
             Row {
                 positionsPiecePuzzles.subList(counter, counter + 5).forEach{ positionInRow ->
@@ -198,10 +215,10 @@ fun PositionsForPuzzles(
                     }
                 }
             }
-            if(counter != 20){
-                counter += 5
-            }
         }
+    }
+    if(counter < 20){
+        onNextRow()
     }
 }
 
@@ -272,7 +289,9 @@ fun DraggedPuzzles(
 @Composable
 fun PuzzlesList(
     piecesPuzzle:  MutableList<PuzzlePiece>,
-    onTap: (PuzzlePiece, Offset) -> Unit
+    offset: Offset,
+    onTap: (PuzzlePiece, Offset) -> Unit,
+    onGloballySetPosition: (LayoutCoordinates) -> Unit
 ){
     LazyHorizontalGrid(
         rows = GridCells.Fixed(2),
@@ -288,7 +307,10 @@ fun PuzzlesList(
                 listItem.id
             }
         ){ piece ->
-            PuzzlePiece(puzzlePiece = piece,
+            com.boundless.GIGABET.wonders.screens.assemblyPuzzle.PuzzlePiece(
+                puzzlePiece = piece,
+                offset = offset,
+                onGloballySetPosition = onGloballySetPosition,
                 onTap = { puzzlePiece, offSet ->
                     onTap(puzzlePiece, offSet)
                 }
@@ -364,10 +386,10 @@ fun ProgressIndicator(
 @Composable
 fun PuzzlePiece(
     puzzlePiece : PuzzlePiece,
-    onTap : (PuzzlePiece, Offset) -> Unit
+    onTap : (PuzzlePiece, Offset) -> Unit,
+    onGloballySetPosition : (LayoutCoordinates) -> Unit,
+    offset: Offset
 ){
-    var offset by remember { mutableStateOf(Offset(0f, 0f)) }
-
     Box(modifier = Modifier.size(75.dp), contentAlignment = Alignment.Center) {
         Surface(
             modifier = Modifier.size(75.dp),
@@ -385,8 +407,7 @@ fun PuzzlePiece(
                         }
                     }
                     .onGloballyPositioned { layoutCoordinates ->
-                        val offsetBox = layoutCoordinates.positionInRoot()
-                        offset = offsetBox
+                        onGloballySetPosition(layoutCoordinates)
                     }
             )
         }
