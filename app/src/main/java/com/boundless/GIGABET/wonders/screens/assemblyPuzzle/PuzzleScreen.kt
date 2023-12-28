@@ -1,6 +1,7 @@
 package com.boundless.GIGABET.wonders.screens.assemblyPuzzle
 
 import android.graphics.Bitmap
+import android.graphics.Picture
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,12 +31,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.NonRestartableComposable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.consumeAllChanges
@@ -45,17 +51,22 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import com.boundless.GIGABET.wonders.R
 import com.boundless.GIGABET.wonders.event.UiEventPuzzleAssembly
+import com.boundless.GIGABET.wonders.models.Image
 import com.boundless.GIGABET.wonders.models.PuzzlePiece
 import com.boundless.GIGABET.wonders.models.SnapZone
 import com.boundless.GIGABET.wonders.navigation.Screens
 import com.boundless.GIGABET.wonders.utils.HelperApp
+import kotlinx.collections.immutable.ImmutableCollection
+import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.roundToInt
 
 
@@ -149,12 +160,7 @@ fun PuzzleScreen(navHostController: NavHostController){
         }
     }
 
-    Image(
-        painter = painterResource(id = R.drawable.background),
-        modifier = Modifier.fillMaxSize(),
-        contentScale = ContentScale.Crop,
-        contentDescription = ""
-    )
+    BackgroundWallpaper()
 
     Column(
         modifier = Modifier
@@ -175,14 +181,13 @@ fun PuzzleScreen(navHostController: NavHostController){
 
         PuzzlesList(
             state.piecesPuzzle,
-            offset = state.offSetPuzzle,
             onGloballySetPosition = onGloballySetPosition,
             onTap = onTapPuzzlesList
         )
     }
 
     DraggedPuzzles(
-        state.selectedPiecesPuzzle,
+        selectedPiecesPuzzle = state.selectedPiecesPuzzle,
         onDragEnd = onDragEnd,
         onDragStart = onDragStart,
         onDrag = onDrag
@@ -193,7 +198,7 @@ fun PuzzleScreen(navHostController: NavHostController){
             onDismiss = onDismiss,
             isVictory = state.isVictory,
             onDismissOnVictory = onDismissOnVictory,
-            choosePuzzlePiece = state.selectedPuzzle.image!!
+            choosePuzzlePiece = state.selectedPuzzle
         )
 
     BackHandler(onBack = onBackPressed)
@@ -201,15 +206,16 @@ fun PuzzleScreen(navHostController: NavHostController){
 
 @Composable
 fun PositionsForPuzzles(
-    positionsPiecePuzzles: MutableList<PuzzlePiece>,
+    positionsPiecePuzzles: ImmutableCollection<PuzzlePiece>,
     onSetSnapZone: (SnapZone) -> Unit,
     counter : Int,
     onNextRow : () -> Unit
 ){
     listOf(1, 2, 3, 4, 5).forEach { _ ->
+        val currentRow = positionsPiecePuzzles.toImmutableList().subList(counter, counter + 5)
         Column {
             Row {
-                positionsPiecePuzzles.subList(counter, counter + 5).forEach{ positionInRow ->
+                currentRow.forEach{ positionInRow ->
                     AreaOfPuzzlePiece(positionInRow){ snapZone ->
                         onSetSnapZone(snapZone)
                     }
@@ -221,13 +227,22 @@ fun PositionsForPuzzles(
         onNextRow()
     }
 }
-
+@NonRestartableComposable
+@Composable
+fun BackgroundWallpaper(){
+    Image(
+        painter = painterResource(id = R.drawable.background),
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop,
+        contentDescription = ""
+    )
+}
 @Composable
 fun ResultsAssemblyPuzzle(
     isVictory : Boolean,
     onDismiss: () -> Unit,
     onDismissOnVictory : () -> Unit,
-    choosePuzzlePiece: Bitmap
+    choosePuzzlePiece: Image
 ){
     val isDefeat = !isVictory
 
@@ -240,7 +255,7 @@ fun ResultsAssemblyPuzzle(
     if(isVictory){
         AlertDialogVictory(
             onDismiss = onDismiss,
-            completedPuzzle = choosePuzzlePiece
+            completedPuzzle = choosePuzzlePiece.image!!
         )
         onDismiss()
         onDismissOnVictory()
@@ -249,14 +264,16 @@ fun ResultsAssemblyPuzzle(
 
 @Composable
 fun DraggedPuzzles(
-    selectedPiecesPuzzle: MutableList<PuzzlePiece>,
+    selectedPiecesPuzzle: ImmutableCollection<PuzzlePiece>,
     onDragEnd : (Int) -> Unit,
     onDragStart : (Int) -> Unit,
     onDrag : (Offset, PointerInputChange, PuzzlePiece, Int) -> Unit
 ){
     selectedPiecesPuzzle.forEachIndexed { index, puzzle ->
         Image(
-            bitmap = puzzle.piece!!.asImageBitmap(), "",
+            contentDescription = "",
+            bitmap = puzzle.piece!!.asImageBitmap(),
+            contentScale = ContentScale.Fit,
             modifier = Modifier
                 .offset {
                     IntOffset(
@@ -281,15 +298,43 @@ fun DraggedPuzzles(
                         )
                     }
                 }
-                .size(50.dp)
+                .size(25.dp)
         )
     }
 }
 
 @Composable
+@Preview(showBackground = true)
+fun PreviewDraggablePuzzlePiece(){
+
+    val piece = ImageBitmap.imageResource(id = R.drawable.background)
+    var offSet : IntOffset by remember {
+       mutableStateOf(IntOffset(0, 0))
+    }
+
+    Image(
+        contentDescription = "",
+        bitmap = piece,
+        contentScale = ContentScale.Fit,
+        modifier = Modifier
+            .offset {
+                IntOffset(
+                    offSet.x,
+                    offSet.y
+                )
+            }
+            .pointerInput(Unit) {
+                detectDragGestures( ){ change, dragAmount ->
+                    offSet += IntOffset(dragAmount.x.roundToInt(), dragAmount.y.roundToInt())
+                }
+            }
+            .size(25.dp)
+    )
+}
+
+@Composable
 fun PuzzlesList(
-    piecesPuzzle:  MutableList<PuzzlePiece>,
-    offset: Offset,
+    piecesPuzzle:  ImmutableCollection<PuzzlePiece>,
     onTap: (PuzzlePiece, Offset) -> Unit,
     onGloballySetPosition: (LayoutCoordinates) -> Unit
 ){
@@ -302,14 +347,13 @@ fun PuzzlesList(
         verticalArrangement = Arrangement.Center
     ){
         items(
-            piecesPuzzle,
+            piecesPuzzle.toImmutableList(),
             key = { listItem ->
                 listItem.id
             }
         ){ piece ->
-            com.boundless.GIGABET.wonders.screens.assemblyPuzzle.PuzzlePiece(
+            PuzzlePiece(
                 puzzlePiece = piece,
-                offset = offset,
                 onGloballySetPosition = onGloballySetPosition,
                 onTap = { puzzlePiece, offSet ->
                     onTap(puzzlePiece, offSet)
@@ -388,7 +432,6 @@ fun PuzzlePiece(
     puzzlePiece : PuzzlePiece,
     onTap : (PuzzlePiece, Offset) -> Unit,
     onGloballySetPosition : (LayoutCoordinates) -> Unit,
-    offset: Offset
 ){
     Box(modifier = Modifier.size(75.dp), contentAlignment = Alignment.Center) {
         Surface(
@@ -402,7 +445,7 @@ fun PuzzlePiece(
                     .padding(8.dp)
                     .size(50.dp)
                     .pointerInput(Unit) {
-                        detectTapGestures {
+                        detectTapGestures { offset ->
                             onTap(puzzlePiece, offset)
                         }
                     }
@@ -415,7 +458,10 @@ fun PuzzlePiece(
 }
 
 @Composable
-fun AreaOfPuzzlePiece(puzzlePiece: PuzzlePiece, setSnapZone: (SnapZone) -> Unit){
+fun AreaOfPuzzlePiece(
+    puzzlePiece: PuzzlePiece,
+    setSnapZone: (SnapZone) -> Unit
+){
     if(puzzlePiece.piece == null){
         Box(
             modifier = Modifier

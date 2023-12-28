@@ -42,6 +42,7 @@ import com.boundless.GIGABET.wonders.screens.settings.SettingsViewModel
 import com.boundless.GIGABET.wonders.ui.theme.SportAppTheme
 import com.boundless.GIGABET.wonders.utils.HelperApp
 
+
 class MainActivity : ComponentActivity() {
     private fun restartApp(context: Context) {
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)

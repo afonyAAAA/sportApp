@@ -15,6 +15,8 @@ import com.boundless.GIGABET.wonders.models.PuzzlePiece
 import com.boundless.GIGABET.wonders.models.SnapZone
 import com.boundless.GIGABET.wonders.states.StateAssemblyPuzzle
 import com.boundless.GIGABET.wonders.states.StateSettingsPuzzle
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -45,7 +47,7 @@ class AssemblyPuzzleViewModel(
                 )
 
                 stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
-                    selectedPiecesPuzzle = newListSelectedPuzzle.toMutableList(),
+                    selectedPiecesPuzzle = newListSelectedPuzzle.toImmutableList(),
                 )
 
                 deletePiecePuzzle(event.puzzlePiece.copy(offsetY = 0f, offSetX = 0f))
@@ -53,16 +55,16 @@ class AssemblyPuzzleViewModel(
             is UiEventPuzzleAssembly.SetSnapZone -> {
                 val newSnapZones = stateAssemblyPuzzle.snapZones + event.snapZone
                 stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
-                    snapZones = newSnapZones.toMutableList()
+                    snapZones = newSnapZones.toImmutableList()
                 )
             }
             is UiEventPuzzleAssembly.PuzzleIsChoose -> {
                 val piecesPuzzle = splitImage()
 
                 stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
-                    piecesPuzzle = piecesPuzzle.shuffled().toMutableList(),
+                    piecesPuzzle = piecesPuzzle.shuffled().toImmutableList(),
                     positionsPiecePuzzles =
-                        piecesPuzzle.map { PuzzlePiece(piece = null, position = it.position) }.toMutableList(),
+                        piecesPuzzle.map { PuzzlePiece(piece = null, position = it.position) }.toImmutableList(),
                     timerIsRunning = settings.timerIsOn
                 )
 
@@ -75,14 +77,14 @@ class AssemblyPuzzleViewModel(
                 val selectedPuzzle = updatedPuzzles[event.index]
 
                 updatedPuzzles[event.index] = selectedPuzzle.copy(offsetY = selectedPuzzle.offsetY + event.offset.y, offSetX = selectedPuzzle.offSetX + event.offset.x)
-                stateAssemblyPuzzle = stateAssemblyPuzzle.copy(selectedPiecesPuzzle = updatedPuzzles)
+                stateAssemblyPuzzle = stateAssemblyPuzzle.copy(selectedPiecesPuzzle = updatedPuzzles.toImmutableList())
             }
             UiEventPuzzleAssembly.PuzzleIsCompleted -> {
                 addCompletedPuzzle()
             }
             UiEventPuzzleAssembly.ResetAssemblyPuzzle -> {
                 stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
-                    selectedPiecesPuzzle = mutableListOf(),
+                    selectedPiecesPuzzle = persistentListOf(),
                     totalTime = 300,
                     isVictory = false,
                     isDefeat = false
@@ -142,7 +144,7 @@ class AssemblyPuzzleViewModel(
         )
 
         stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
-            selectedPiecesPuzzle = updatedPuzzle
+            selectedPiecesPuzzle = updatedPuzzle.toImmutableList()
         )
     }
 
@@ -160,12 +162,12 @@ class AssemblyPuzzleViewModel(
         for (pos in newPositionsPuzzlePiece){
             if(pos.position == position){
                 val index = newPositionsPuzzlePiece.indexOf(pos)
-                newPositionsPuzzlePiece[index] = PuzzlePiece(piece, pos.position,)
+                newPositionsPuzzlePiece[index] = PuzzlePiece(piece, pos.position)
             }
         }
 
         stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
-            positionsPiecePuzzles = newPositionsPuzzlePiece
+            positionsPiecePuzzles = newPositionsPuzzlePiece.toImmutableList()
         )
     }
 
@@ -258,7 +260,7 @@ class AssemblyPuzzleViewModel(
         )
 
         stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
-            selectedPiecesPuzzle = updatedPuzzles
+            selectedPiecesPuzzle = updatedPuzzles.toImmutableList()
         )
 
 
@@ -290,20 +292,23 @@ class AssemblyPuzzleViewModel(
     }
 
     private fun deletePiecePuzzle(piece: PuzzlePiece) {
-        stateAssemblyPuzzle = stateAssemblyPuzzle.copy(piecesPuzzle = stateAssemblyPuzzle.piecesPuzzle.minus(piece).toMutableList())
+        stateAssemblyPuzzle = stateAssemblyPuzzle.copy(piecesPuzzle = stateAssemblyPuzzle
+            .piecesPuzzle
+            .minus(piece)
+            .toImmutableList())
     }
 
     private fun deleteSelectedPiecePuzzle(index : Int){
         val updatedPuzzles = stateAssemblyPuzzle.selectedPiecesPuzzle.toMutableList()
         updatedPuzzles.removeAt(index)
         stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
-            selectedPiecesPuzzle = updatedPuzzles
+            selectedPiecesPuzzle = updatedPuzzles.toImmutableList()
         )
     }
 
     private fun deleteSnapZone(snap: SnapZone) {
         stateAssemblyPuzzle = stateAssemblyPuzzle.copy(
-            snapZones = stateAssemblyPuzzle.snapZones.filter { it.offset != snap.offset }.toMutableList()
+            snapZones = stateAssemblyPuzzle.snapZones.filter { it.offset != snap.offset }.toImmutableList()
         )
 
         if(stateAssemblyPuzzle.snapZones.isEmpty()){
