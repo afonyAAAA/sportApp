@@ -25,13 +25,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.boundless.GIGABET.wonders.R
 import com.boundless.GIGABET.wonders.event.UiEventSettingsPuzzle
-import com.boundless.GIGABET.wonders.screens.assemblyPuzzle.AssemblyPuzzleViewModel
+import com.boundless.GIGABET.wonders.models.NavhostValue
 
 @Composable
-fun SettingsScreen(navHostController: NavHostController){
+fun SettingsScreen(navHostController: NavhostValue){
 
     val context = LocalContext.current
 

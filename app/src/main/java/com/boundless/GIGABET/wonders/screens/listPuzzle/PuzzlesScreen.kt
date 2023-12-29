@@ -31,18 +31,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.boundless.GIGABET.wonders.R
 import com.boundless.GIGABET.wonders.event.UiEventPuzzleChoose
 import com.boundless.GIGABET.wonders.models.Image
+import com.boundless.GIGABET.wonders.models.NavhostValue
 import com.boundless.GIGABET.wonders.navigation.Screens
-import com.boundless.GIGABET.wonders.states.StateChoosePuzzle
 import com.boundless.GIGABET.wonders.utils.HelperApp
+import kotlinx.collections.immutable.ImmutableCollection
+import kotlinx.collections.immutable.toImmutableList
 
 val stateSettings = HelperApp.Settings.state
 
 @Composable
-fun PuzzlesScreen(navHostController: NavHostController){
+fun PuzzlesScreen(navHostController: NavhostValue){
 
     val context = LocalContext.current
     val viewModel = remember { ChoosePuzzleViewModel(context)}
@@ -51,7 +52,7 @@ fun PuzzlesScreen(navHostController: NavHostController){
         { selectedImage ->
             HelperApp.Puzzle.puzzle = selectedImage
             viewModel.onEventChoosePuzzle(UiEventPuzzleChoose.ImageIsChoose(selectedImage))
-            navHostController.navigate(
+            navHostController.navHostController.navigate(
                 Screens.Puzzle.route
             )
         }
@@ -90,12 +91,12 @@ fun PuzzlesScreen(navHostController: NavHostController){
 }
 
 @Composable
-fun ListImages( listImage: List<Image>, onClick: (Image) -> Unit){
+fun ListImages( listImage: ImmutableCollection<Image>, onClick: (Image) -> Unit){
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ){
-        items(listImage){ image ->
+        items(listImage.toImmutableList()){ image ->
             ItemImage(item = image, settingsVisibleImage = stateSettings.imageIsVisible) {
                 onClick(image)
             }

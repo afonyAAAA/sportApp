@@ -1,7 +1,6 @@
 package com.boundless.GIGABET.wonders.screens.assemblyPuzzle
 
 import android.graphics.Bitmap
-import android.graphics.Picture
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -56,11 +55,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import com.boundless.GIGABET.wonders.R
 import com.boundless.GIGABET.wonders.event.UiEventPuzzleAssembly
 import com.boundless.GIGABET.wonders.models.Image
+import com.boundless.GIGABET.wonders.models.NavhostValue
 import com.boundless.GIGABET.wonders.models.PuzzlePiece
 import com.boundless.GIGABET.wonders.models.SnapZone
 import com.boundless.GIGABET.wonders.navigation.Screens
@@ -71,7 +70,7 @@ import kotlin.math.roundToInt
 
 
 @Composable
-fun PuzzleScreen(navHostController: NavHostController){
+fun PuzzleScreen(navHostController: NavhostValue){
 
     val context = LocalContext.current
 
@@ -124,7 +123,7 @@ fun PuzzleScreen(navHostController: NavHostController){
 
     val onDismiss = remember {
         {
-            navHostController.navigate(
+            navHostController.navHostController.navigate(
                 Screens.Puzzles.route,
                 NavOptions.Builder()
                     .setPopUpTo(Screens.Main.route, false)
@@ -142,7 +141,7 @@ fun PuzzleScreen(navHostController: NavHostController){
 
     val onBackPressed = remember  {
         {
-            navHostController.popBackStack()
+            navHostController.navHostController.popBackStack()
             viewModel.onEventAssembly(UiEventPuzzleAssembly.ResetAssemblyPuzzle)
         }
     }

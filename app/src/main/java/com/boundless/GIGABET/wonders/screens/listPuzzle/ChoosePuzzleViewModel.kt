@@ -9,20 +9,21 @@ import androidx.lifecycle.ViewModel
 import com.boundless.GIGABET.wonders.event.UiEventPuzzleChoose
 import com.boundless.GIGABET.wonders.models.Image
 import com.boundless.GIGABET.wonders.states.StateChoosePuzzle
+import kotlinx.collections.immutable.toImmutableList
 
 class ChoosePuzzleViewModel(private val context: Context) : ViewModel() {
 
     var stateChoosePuzzle by mutableStateOf(StateChoosePuzzle())
 
     init {
-        stateChoosePuzzle = stateChoosePuzzle.copy(listImage = getAllPuzzles())
+        stateChoosePuzzle = stateChoosePuzzle.copy(listImage = getAllPuzzles().toImmutableList())
     }
 
     fun onEventChoosePuzzle(event: UiEventPuzzleChoose){
         stateChoosePuzzle = when(event){
             UiEventPuzzleChoose.ShowImages -> {
                 stateChoosePuzzle.copy(
-                    listImage = getAllPuzzles()
+                    listImage = getAllPuzzles().toImmutableList()
                 )
             }
             is UiEventPuzzleChoose.ImageIsChoose -> {
