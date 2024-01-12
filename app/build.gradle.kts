@@ -68,6 +68,10 @@ android {
 
 dependencies {
 
+    val appCenterSdkVersion = "4.4.5"
+    implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
+    implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
+
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.7.2")
@@ -76,6 +80,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.runtime:runtime-livedata")
     implementation("androidx.compose.compiler:compiler:1.4.2")
     implementation("androidx.compose.material3:material3")
     testImplementation("junit:junit:4.13.2")

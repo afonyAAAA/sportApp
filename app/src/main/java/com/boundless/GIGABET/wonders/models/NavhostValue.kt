@@ -5,4 +5,7 @@ import androidx.navigation.NavHostController
 
 
 @Stable
-data class NavhostValue(val navHostController: NavHostController)
+data class NavhostValue(
+    @Stable
+    val navHostController: NavHostController
+)

@@ -46,14 +46,14 @@ val stateSettings = HelperApp.Settings.state
 fun PuzzlesScreen(navHostController: NavhostValue){
 
     val context = LocalContext.current
-    val viewModel = remember { ChoosePuzzleViewModel(context)}
+    val viewModel = remember {ChoosePuzzleViewModel(context)}
     val state = viewModel.stateChoosePuzzle
-    val onSelectImage : (Image) -> Unit = remember(viewModel) {
+    val onSelectImage : (Image) -> Unit = remember{
         { selectedImage ->
             HelperApp.Puzzle.puzzle = selectedImage
             viewModel.onEventChoosePuzzle(UiEventPuzzleChoose.ImageIsChoose(selectedImage))
             navHostController.navHostController.navigate(
-                Screens.Puzzle.route
+                Screens.AssemblyPuzzle.route
             )
         }
     }

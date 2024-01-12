@@ -41,6 +41,9 @@ import com.boundless.GIGABET.wonders.screens.MainViewModel
 import com.boundless.GIGABET.wonders.screens.settings.SettingsViewModel
 import com.boundless.GIGABET.wonders.ui.theme.SportAppTheme
 import com.boundless.GIGABET.wonders.utils.HelperApp
+import com.microsoft.appcenter.AppCenter
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.crashes.Crashes
 
 
 class MainActivity : ComponentActivity() {
@@ -52,14 +55,19 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppCenter.start(
+            application, "b3dd861d-6153-4884-9a3e-2210671404a1",
+            Analytics::class.java, Crashes::class.java
+        )
 
         val context = applicationContext
-        val viewModel = MainViewModel(context)
-        val stateSettings = SettingsViewModel(context).stateSettingsPuzzle
 
-        HelperApp.Settings.state = stateSettings
+        val viewModel = MainViewModel(context)
 
         setContent {
+            val stateSettings = SettingsViewModel(context).stateSettingsPuzzle
+            HelperApp.Settings.state = stateSettings.value!!
+
             SportAppTheme {
                 Box(
                     modifier = Modifier.fillMaxSize(),

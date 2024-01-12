@@ -124,7 +124,7 @@ fun PuzzleScreen(navHostController: NavhostValue){
     val onDismiss = remember {
         {
             navHostController.navHostController.navigate(
-                Screens.Puzzles.route,
+                Screens.ListPuzzles.route,
                 NavOptions.Builder()
                     .setPopUpTo(Screens.Main.route, false)
                     .build()
@@ -230,7 +230,7 @@ fun PositionsForPuzzles(
 @Composable
 fun BackgroundWallpaper(){
     Image(
-        painter = painterResource(id = R.drawable.background),
+        bitmap = ImageBitmap.imageResource(R.drawable.background),
         modifier = Modifier.fillMaxSize(),
         contentScale = ContentScale.Crop,
         contentDescription = ""
@@ -268,67 +268,41 @@ fun DraggedPuzzles(
     onDragStart : (Int) -> Unit,
     onDrag : (Offset, PointerInputChange, PuzzlePiece, Int) -> Unit
 ){
-    selectedPiecesPuzzle.forEachIndexed { index, puzzle ->
-        Image(
-            contentDescription = "",
-            bitmap = puzzle.piece!!.asImageBitmap(),
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .offset {
-                    IntOffset(
-                        puzzle.offSetX.roundToInt(),
-                        puzzle.offsetY.roundToInt()
-                    )
-                }
-                .pointerInput(Unit) {
-                    detectDragGestures(
-                        onDragEnd = {
-                            onDragEnd(index)
-                        },
-                        onDragStart = {
-                            onDragStart(index)
-                        }
-                    ) { change, dragAmount ->
-                        onDrag(
-                            dragAmount,
-                            change,
-                            puzzle,
-                            index
+    Box(modifier = Modifier.fillMaxSize()){
+        selectedPiecesPuzzle.forEachIndexed { index, puzzle ->
+            Image(
+                contentDescription = "",
+                bitmap = puzzle.piece!!.asImageBitmap(),
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .offset {
+                        IntOffset(
+                            puzzle.offSetX.roundToInt(),
+                            puzzle.offsetY.roundToInt()
                         )
                     }
-                }
-                .size(25.dp)
-        )
+                    .pointerInput(Unit) {
+                        detectDragGestures(
+                            onDragEnd = {
+                                onDragEnd(index)
+                            },
+                            onDragStart = {
+                                onDragStart(index)
+                            }
+                        ) { change, dragAmount ->
+                            onDrag(
+                                dragAmount,
+                                change,
+                                puzzle,
+                                index
+                            )
+                        }
+                    }
+                    .size(50.dp)
+            )
+        }
     }
-}
 
-@Composable
-@Preview(showBackground = true)
-fun PreviewDraggablePuzzlePiece(){
-
-    val piece = ImageBitmap.imageResource(id = R.drawable.background)
-    var offSet : IntOffset by remember {
-       mutableStateOf(IntOffset(0, 0))
-    }
-
-    Image(
-        contentDescription = "",
-        bitmap = piece,
-        contentScale = ContentScale.Fit,
-        modifier = Modifier
-            .offset {
-                IntOffset(
-                    offSet.x,
-                    offSet.y
-                )
-            }
-            .pointerInput(Unit) {
-                detectDragGestures( ){ change, dragAmount ->
-                    offSet += IntOffset(dragAmount.x.roundToInt(), dragAmount.y.roundToInt())
-                }
-            }
-            .size(25.dp)
-    )
 }
 
 @Composable

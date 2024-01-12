@@ -15,6 +15,8 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import com.boundless.GIGABET.wonders.R
 import com.boundless.GIGABET.wonders.event.UiEventSettingsPuzzle
 import com.boundless.GIGABET.wonders.models.NavhostValue
+import com.boundless.GIGABET.wonders.utils.HelperApp
 
 @Composable
 fun SettingsScreen(navHostController: NavhostValue){
@@ -38,21 +41,21 @@ fun SettingsScreen(navHostController: NavhostValue){
         SettingsViewModel(context)
     }
 
-    val state = viewModel.stateSettingsPuzzle
+    val state = viewModel.stateSettingsPuzzle.observeAsState()
 
-    val changeVisibleStateImage : (Boolean) -> Unit = remember(viewModel) {
+    val changeVisibleStateImage : (Boolean) -> Unit = remember{
         {
             viewModel.onEventSettingsPuzzle(UiEventSettingsPuzzle.VisibleStateImageChoose(it))
         }
     }
 
-    val changeTimerState : (Boolean) -> Unit = remember(viewModel) {
+    val changeTimerState : (Boolean) -> Unit = remember{
         {
             viewModel.onEventSettingsPuzzle(UiEventSettingsPuzzle.TimerStateImageChoose(it))
         }
     }
 
-    val changeResetCompletedPuzzle = remember(viewModel) {
+    val changeResetCompletedPuzzle = remember{
         {
             viewModel.onEventSettingsPuzzle(UiEventSettingsPuzzle.ResetCompletedPuzzle)
         }
@@ -78,13 +81,13 @@ fun SettingsScreen(navHostController: NavhostValue){
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = "Puzzle pictures are open", color = MaterialTheme.colorScheme.onPrimary)
                 Spacer(modifier = Modifier.width(8.dp))
-                Checkbox(checked = state.imageIsVisible, onCheckedChange = changeVisibleStateImage)
+                Checkbox(checked = state.value!!.imageIsVisible, onCheckedChange = changeVisibleStateImage)
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = "Assembling puzzles against time", color = MaterialTheme.colorScheme.onPrimary)
                 Spacer(modifier = Modifier.width(8.dp))
-                Checkbox(checked = state.timerIsOn, onCheckedChange = changeTimerState)
+                Checkbox(checked = state.value!!.timerIsOn, onCheckedChange = changeTimerState)
             }
 
             Button(

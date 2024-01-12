@@ -2,7 +2,6 @@ package com.boundless.GIGABET.wonders.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,8 +15,8 @@ import com.boundless.GIGABET.wonders.screens.settings.SettingsScreen
 
 sealed class Screens(val route : String){
     object Main : Screens("main_screen")
-    object Puzzles : Screens("puzzles_screen")
-    object Puzzle : Screens("puzzle_screen")
+    object ListPuzzles : Screens("puzzles_screen")
+    object AssemblyPuzzle : Screens("puzzle_screen")
     object Settings : Screens("settings_screen")
 }
 
@@ -25,14 +24,13 @@ sealed class Screens(val route : String){
 @Composable
 fun NavPuzzle(){
 
-    val navHostController = rememberNavController()
-
-    val navHostControllerValue = remember(navHostController) {
-        NavhostValue(navHostController)
-    }
+    val navHostControllerValue =
+        NavhostValue(
+            navHostController = rememberNavController()
+        )
 
     NavHost(
-        navController = navHostController,
+        navController = navHostControllerValue.navHostController,
         startDestination = Screens.Main.route,
         modifier = Modifier
             .fillMaxSize()
@@ -40,10 +38,10 @@ fun NavPuzzle(){
         composable(Screens.Main.route){
             MainScreen(navHostController = navHostControllerValue)
         }
-        composable(Screens.Puzzles.route){
+        composable(Screens.ListPuzzles.route){
             PuzzlesScreen(navHostController = navHostControllerValue)
         }
-        composable(Screens.Puzzle.route){
+        composable(Screens.AssemblyPuzzle.route){
             PuzzleScreen(navHostController = navHostControllerValue)
         }
         composable(Screens.Settings.route){

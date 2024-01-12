@@ -55,7 +55,7 @@ fun MainScreen(navHostController: NavhostValue){
         }
 
         Button(onClick = {
-            navHostController.navHostController.navigate(Screens.Puzzles.route)
+            navHostController.navHostController.navigate(Screens.ListPuzzles.route)
         }) {
             Text(text = "Play")
         }
